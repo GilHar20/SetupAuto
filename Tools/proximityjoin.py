@@ -2,26 +2,15 @@ import bpy
 
 
 
-#==============================================
-
-
-class SETUPAUTO_PG_proxjoin_props (bpy.types.PropertyGroup):
-    proximity : bpy.props.FloatProperty(
-    name = "Proximity",
-    default = 1.0.5
-    )
-
-
-#==============================================
-
-
 class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
-    '''Class sorts objects'''
+    '''Class join objects in proximity to each other'''
     bl_idname = "setupauto.ot_proxjoin"
     bl_label = "proximity join"
     bl_description = "Operator loops through objects in the scene, joining objects together if are closer than specified proximity."
 
-    def Execute(self, context):
+    def execute(self, context):
+        tools_props = context.scene.tools_props
+        
         selected = [obj for obj in context.selected_objects if obj.type == 'MESH']
         remaining = set(selected)  # Keep track of unclustered objects
         clusters = []
@@ -36,7 +25,7 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
                 current_loc = current.location
 
                 close_objs = {other for other in remaining
-                            if (current_loc - other.location).length <= proximity}
+                            if (current_loc - other.location).length <= tools_props.proximity}
 
                 cluster.extend(close_objs)
                 to_check.extend(close_objs)
@@ -60,3 +49,11 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
         print(f"Joined {len([c for c in clusters if len(c) > 1])} clusters.")
 
         return {'FINISHED'}
+
+
+
+def register():
+    bpy.utils.register_class(SETUPAUTO_OT_proxjoin)
+
+def unregister():
+    bpy.utils.unregister_class(SETUPAUTO_OT_proxjoin)
