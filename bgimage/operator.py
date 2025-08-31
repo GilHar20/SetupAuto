@@ -105,10 +105,3 @@ class SETUPAUTO_OT_bgimage(bpy.types.Operator):
                 print(str(camera.name) + "camera does not exist")
 
         return {'FINISHED'}
-
-
-def register():
-    bpy.utils.register_class(SETUPAUTO_OT_bgimage)
-
-def unregister():
-    bpy.utils.unregister_class(SETUPAUTO_OT_bgimage)

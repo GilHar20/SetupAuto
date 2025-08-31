@@ -6,20 +6,25 @@ bl_info = {
     "location": "View3D > Tool Shelf",
     "description": "A plugin to help setup imported files in Blender, made for archviz.",
     "category": "3D View",
-    "git_url": "https://github.com/GilHar20/AutoSetup.git",
+    "git_url": "https://github.com/GilHar20/SetupAuto.git",
     "git_branch": "main",
     "git_commit": "main",
-    "tracker_url": "https://github.com/GilHar20/AutoSetup/issues",
-    "doc_url": "https://github.com/GilHar20/AutoSetup",
+    "tracker_url": "https://github.com/GilHar20/SetupAuto/issues",
+    "doc_url": "https://github.com/GilHar20/SetupAuto",
 }
 
 import bpy
-from .quicksort import register as register_quicksort, unregister as unregister_quicksort
-from .bgimage import register as register_bgimage, unregister as unregister_bgimage
-from .Tools import register as register_Tools, unregister as unregister_Tools
 
-# Import the addon updater
+# Import all modules to ensure classes are available for auto-registration
+from . import quicksort
+from . import bgimage
+from . import Tools
+
+# Import the addon updater (not part of auto-registration)
 from . import addon_updater_ops
+
+# Import the auto-registration system
+from . import auto_registration
 
 
 #==============================================
@@ -99,44 +104,25 @@ class SetupAutoPreferences(bpy.types.AddonPreferences):
 
 
 def register():
-    # Addon updater code and configurations.
-    # In case of a broken version, try to register the updater first so that
-    # users can revert back to a working version.
-    addon_updater_ops.register(bl_info)
-    
-    # Register preferences class
+    # Register preferences class (not part of auto-registration)
     addon_updater_ops.make_annotations(SetupAutoPreferences)  # Avoid blender 2.8 warnings
     bpy.utils.register_class(SetupAutoPreferences)
     
-    # Register modules
-    register_quicksort()
-    register_bgimage()
-    register_Tools()
-
-    # Create a collection property to hold multiple pattern property groups
-    from .quicksort.properties import SETUPAUTO_PG_quicksort_props
-    from .bgimage.properties import SETUPAUTO_PG_bgimage_props
-    from .Tools.properties import SETUPAUTO_PG_tools_props
+    # Use auto-registration system for all classes (including addon updater)
+    auto_registration.register()
     
-    bpy.types.Scene.pattern_props = bpy.props.CollectionProperty(type=SETUPAUTO_PG_quicksort_props)
-    bpy.types.Scene.bgimage_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_bgimage_props)
-    bpy.types.Scene.tools_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_tools_props)
+    # Configure addon updater (after classes are registered)
+    addon_updater_ops.register(bl_info)
 
 def unregister():
-    # Addon updater unregister
+    # Addon updater unregister (before classes are unregistered)
     addon_updater_ops.unregister()
     
-    # Unregister preferences class
+    # Unregister preferences class (not part of auto-registration)
     bpy.utils.unregister_class(SetupAutoPreferences)
     
-    # Unregister modules
-    unregister_bgimage()
-    unregister_quicksort()
-    unregister_Tools()
-
-    del bpy.types.Scene.pattern_props
-    del bpy.types.Scene.bgimage_props
-    del bpy.types.Scene.tools_props
+    # Use auto-registration system to unregister all classes
+    auto_registration.unregister()
 
 
 #==============================================

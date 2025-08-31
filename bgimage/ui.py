@@ -47,9 +47,3 @@ class SETUPAUTO_PT_bgimage_panel(bpy.types.Panel):
 
         row10 = box1.row()
         row10.operator('setupauto.ot_bgimage', text = "Assign Images!")
-
-def register():
-    bpy.utils.register_class(SETUPAUTO_PT_bgimage_panel)
-
-def unregister():
-    bpy.utils.unregister_class(SETUPAUTO_PT_bgimage_panel)

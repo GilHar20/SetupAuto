@@ -30,6 +30,9 @@ class AutoRegistration:
         # Discover classes from each submodule
         for module in submodules:
             self._discover_classes_from_module(module)
+            
+        # Also discover classes from addon updater modules
+        self._discover_addon_updater_classes()
     
     def _get_submodules(self, module) -> List:
         """Get all submodules of the addon."""
@@ -65,6 +68,14 @@ class AutoRegistration:
                 # Check if it's a Blender class
                 if self._is_blender_class(obj):
                     self._categorize_class(obj)
+    
+    def _discover_addon_updater_classes(self) -> None:
+        """Discover classes from addon updater modules."""
+        # Check if addon updater modules exist
+        addon_updater_ops = sys.modules.get(f"{self.addon_name}.addon_updater_ops")
+        if addon_updater_ops:
+            self._discover_classes_from_module(addon_updater_ops)
+            print(f"Discovered classes from addon_updater_ops module")
     
     def _is_blender_class(self, cls) -> bool:
         """Check if a class is a Blender class."""
@@ -121,6 +132,9 @@ class AutoRegistration:
     def register(self) -> None:
         """Register all discovered classes."""
         print(f"Auto-registering {len(self.classes)} classes and {len(self.property_groups)} PropertyGroups...")
+        
+        # Set flag to indicate auto-registration is active
+        bpy.context.auto_registration_active = True
         
         # First register PropertyGroups
         for class_name, cls in self.property_groups.items():
@@ -179,6 +193,10 @@ class AutoRegistration:
                 print(f"Unregistered {cls.__name__}")
             except Exception as e:
                 print(f"Error unregistering {cls.__name__}: {e}")
+        
+        # Clear auto-registration flag
+        if hasattr(bpy.context, 'auto_registration_active'):
+            delattr(bpy.context, 'auto_registration_active')
     
     def get_registration_info(self) -> Dict[str, List[str]]:
         """Get information about what will be registered."""

@@ -45,15 +45,3 @@ class SETUPAUTO_OT_remove_pattern(bpy.types.Operator):
         if len(context.scene.pattern_props) > 0:
             context.scene.pattern_props.remove(len(context.scene.pattern_props) - 1)
         return {'FINISHED'}
-
-
-
-def register():
-    bpy.utils.register_class(SETUPAUTO_PG_quicksort_props)
-    bpy.utils.register_class(SETUPAUTO_OT_add_pattern)
-    bpy.utils.register_class(SETUPAUTO_OT_remove_pattern)
-
-def unregister():
-    bpy.utils.unregister_class(SETUPAUTO_OT_remove_pattern)
-    bpy.utils.unregister_class(SETUPAUTO_OT_add_pattern)
-    bpy.utils.unregister_class(SETUPAUTO_PG_quicksort_props)

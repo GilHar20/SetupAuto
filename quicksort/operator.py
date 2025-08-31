@@ -68,11 +68,3 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
             bpy.ops.object.select_all(action='DESELECT')
         
         return {'FINISHED'}
-
-
-
-def register():
-    bpy.utils.register_class(SETUPAUTO_OT_quicksort)
-
-def unregister():
-    bpy.utils.unregister_class(SETUPAUTO_OT_quicksort)

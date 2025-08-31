@@ -1509,11 +1509,13 @@ def register(bl_info):
     # The register line items for all operators/panels.
     # If using bpy.utils.register_module(__name__) to register elsewhere
     # in the addon, delete these lines (also from unregister).
-    for cls in classes:
-        # Apply annotations to remove Blender 2.8+ warnings, no effect on 2.7
-        make_annotations(cls)
-        # Comment out this line if using bpy.utils.register_module(__name__)
-        bpy.utils.register_class(cls)
+    # Skip class registration if auto-registration is being used
+    if not hasattr(bpy.context, 'auto_registration_active'):
+        for cls in classes:
+            # Apply annotations to remove Blender 2.8+ warnings, no effect on 2.7
+            make_annotations(cls)
+            # Comment out this line if using bpy.utils.register_module(__name__)
+            bpy.utils.register_class(cls)
 
     # Special situation: we just updated the addon, show a popup to tell the
     # user it worked. Could enclosed in try/catch in case other issues arise.
@@ -1521,9 +1523,11 @@ def register(bl_info):
 
 
 def unregister():
-    for cls in reversed(classes):
-        # Comment out this line if using bpy.utils.unregister_module(__name__).
-        bpy.utils.unregister_class(cls)
+    # Skip class unregistration if auto-registration is being used
+    if not hasattr(bpy.context, 'auto_registration_active'):
+        for cls in reversed(classes):
+            # Comment out this line if using bpy.utils.unregister_module(__name__).
+            bpy.utils.unregister_class(cls)
 
     # Clear global vars since they may persist if not restarting blender.
     updater.clear_state()  # Clear internal vars, avoids reloading oddities.

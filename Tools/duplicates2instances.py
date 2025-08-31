@@ -36,11 +36,3 @@ class SETUPAUTO_OT_dups2inst(bpy.types.Operator):
     def execute(self, context):
         self.replace_with_instances()
         return {'FINISHED'}
-
-
-
-def register():
-    bpy.utils.register_class(SETUPAUTO_OT_dups2inst)
-
-def unregister():
-    bpy.utils.unregister_class(SETUPAUTO_OT_dups2inst)
