@@ -1,7 +1,7 @@
 bl_info = {
     "name": "SetupAuto",
-    "version": (1, 0, 1),
-    "blender": (4, 3, 0),
+    "version": (1, 2, 0),
+    "blender": (4, 5, 0),
     "author": "Gilad Harnik",
     "location": "View3D > Tool Shelf",
     "description": "A plugin to help setup imported files from CAD software in Blender, made for archviz.",
@@ -9,15 +9,14 @@ bl_info = {
 }
 
 import bpy
-from .quicksort import SETUPAUTO_OT_quicksort
-from .quicksort import SETUPAUTO_PG_quicksort_props
-
-from .bgimage import SETUPAUTO_OT_bgimage
-from .bgimage import SETUPAUTO_PG_bgimage_props
+from .quicksort import register as register_quicksort, unregister as unregister_quicksort
+from .bgimage import register as register_bgimage, unregister as unregister_bgimage
+from .Tools import register as register_Tools, unregister as unregister_Tools
 
 
 
 #==============================================
+
 
 import os
 import shutil
@@ -81,81 +80,6 @@ class WM_OT_UpdateAddon(bpy.types.Operator):
             return {'CANCELLED'}
 
 
-#==============================================
-
-
-class SETUPAUTO_PT_mainpanel (bpy.types.Panel):
-    '''Class draws UI panel'''
-    bl_idname = "setupauto.pt_mainpanel"
-    bl_label = "Setup Automation settings panel ahhhhhhhhhhhhhhhhh"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_category = "SetupAuto"
-
-    def draw(self, context):
-        layout = self.layout
-        patternprops = context.scene.pattern_props
-        bgimageprops = context.scene.bgimage_props
-
-        # quick sort settings:
-        box1 = layout.box()
-        header = box1.row()
-        header.label(text = "Quick Sort: ")
-
-        row1 = box1.row()
-        row1.prop(patternprops, "window_pattern")
-        
-        row2 = box1.row()    
-        row2.prop(patternprops, "wall_pattern")
-
-        row3 = box1.row()
-        row3.prop(patternprops, "railings_pattern")
-
-        row4 = box1.row()
-        row4.prop(patternprops, "floor_pattern")
-
-        row5 = box1.row()
-        row5.prop(patternprops, "preserve_pattern")
-
-        row6 = box1.row()
-        row6.prop(patternprops, "shutter_pattern")
-
-        row7 = box1.row()
-        row7.prop(patternprops, "road_pattern")
-
-        row8 = box1.row()
-        row8.label(text = "Quick Sort:")
-        row8.operator('setupauto.ot_quicksort', text = "Quick sort!")
-
-        #bg image settings:
-        box2 = layout.box()
-        header = box2.row()
-        header.label(text = "bgimage: ")
-        
-        row1 = box2.row()
-        row1.prop(bgimageprops, "resolution_x")
-        
-        row2 = box2.row()    
-        row2.prop(bgimageprops, "resolution_y")
-
-        row3 = box2.row()
-        row3.prop(bgimageprops, "bgimage_folder_path")
-
-        row4 = box2.row()
-        row4.prop(bgimageprops, "image_fornmat")
-
-        row5 = box2.row()
-        row5.prop(bgimageprops, "alpha")
-
-        row6 = box2.row()
-        row6.prop(bgimageprops, "frame_method")
-
-        row7 = box2.row()
-        row7.prop(bgimageprops, "display_depth")
-
-        row10 = box2.row()
-        row10.operator('setupauto.ot_bgimage', text = "Assign Images!")
-
 
 #==============================================        
 
@@ -164,32 +88,34 @@ def register():
     bpy.utils.register_class(MyAddonPreferences)
     bpy.utils.register_class(WM_OT_UpdateAddon)
     
-    bpy.utils.register_class(SETUPAUTO_OT_quicksort)
-    bpy.utils.register_class(SETUPAUTO_PG_quicksort_props)
-    
-    bpy.utils.register_class(SETUPAUTO_OT_bgimage)
-    bpy.utils.register_class(SETUPAUTO_PG_bgimage_props) 
+    # Register modules
+    register_quicksort()
+    register_bgimage()
+    register_Tools()
 
-    bpy.utils.register_class(SETUPAUTO_PT_mainpanel)
-
-    bpy.types.Scene.pattern_props = bpy.props.PointerProperty(type = SETUPAUTO_PG_quicksort_props)
-    bpy.types.Scene.bgimage_props = bpy.props.PointerProperty(type = SETUPAUTO_PG_bgimage_props)
+    # Create a collection property to hold multiple pattern property groups
+    from .quicksort.properties import SETUPAUTO_PG_quicksort_props
+    from .bgimage.properties import SETUPAUTO_PG_bgimage_props
+    from .Tools.properties import SETUPAUTO_PG_tools_props
     
+    bpy.types.Scene.pattern_props = bpy.props.CollectionProperty(type=SETUPAUTO_PG_quicksort_props)
+    bpy.types.Scene.bgimage_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_bgimage_props)
+    bpy.types.Scene.tools_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_tools_props)
 
 def unregister():
     bpy.utils.unregister_class(MyAddonPreferences)
     bpy.utils.unregister_class(WM_OT_UpdateAddon)    
     
-    bpy.utils.unregister_class(SETUPAUTO_OT_quicksort)
-    bpy.utils.unregister_class(SETUPAUTO_PG_quicksort_props)
-
-    bpy.utils.unregister_class(SETUPAUTO_OT_bgimage)
-    bpy.utils.unregister_class(SETUPAUTO_PG_bgimage_props) 
-    
-    bpy.utils.unregister_class(SETUPAUTO_PT_mainpanel)
+    # Unregister modules
+    unregister_bgimage()
+    unregister_quicksort()
+    unregister_Tools()
 
     del bpy.types.Scene.pattern_props
     del bpy.types.Scene.bgimage_props
+    del bpy.types.Scene.tools_props
+
+
 
 #==============================================
 

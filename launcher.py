@@ -8,7 +8,7 @@ from pathlib import Path
 def get_blender_addons_path():
     """Get the Blender addons path from user input with default"""
     # Default addons path for Windows
-    default_addons_path = r"C:\Users\Michael\AppData\Roaming\Blender Foundation\Blender\4.5\extensions"
+    default_addons_path = r"C:\Users\Michael\AppData\Roaming\Blender Foundation\Blender\4.5\extensions\user_default"
     
     print(f"Default Blender addons path: {default_addons_path}")
     user_input = input("Enter Blender addons path (or press Enter to use default): ").strip()
