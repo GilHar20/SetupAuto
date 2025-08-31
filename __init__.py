@@ -4,8 +4,13 @@ bl_info = {
     "blender": (4, 5, 0),
     "author": "Gilad Harnik",
     "location": "View3D > Tool Shelf",
-    "description": "A plugin to help setup imported files from CAD software in Blender, made for archviz.",
+    "description": "A plugin to help setup imported files in Blender, made for archviz.",
     "category": "3D View",
+    "git_url": "https://github.com/GilHar20/AutoSetup.git",
+    "git_branch": "main",
+    "git_commit": "main",
+    "tracker_url": "https://github.com/GilHar20/AutoSetup/issues",
+    "doc_url": "https://github.com/GilHar20/AutoSetup",
 }
 
 import bpy
@@ -13,80 +18,95 @@ from .quicksort import register as register_quicksort, unregister as unregister_
 from .bgimage import register as register_bgimage, unregister as unregister_bgimage
 from .Tools import register as register_Tools, unregister as unregister_Tools
 
+# Import the addon updater
+from . import addon_updater_ops
 
 
 #==============================================
 
 
-import os
-import shutil
-import zipfile
 
-class MyAddonPreferences(bpy.types.AddonPreferences):
+class SetupAutoPreferences(bpy.types.AddonPreferences):
     bl_idname = __name__
 
-    update_filepath: bpy.props.StringProperty(
-        name="Update File",
-        description="Select the ZIP file to update the addon",
-        subtype='FILE_PATH'
-    )
+    # Addon updater preferences
+    auto_check_update = bpy.props.BoolProperty(
+        name="Auto-check for Update",
+        description="If enabled, auto-check for updates using an interval",
+        default=False)
+
+    updater_interval_months = bpy.props.IntProperty(
+        name='Months',
+        description="Number of months between checking for updates",
+        default=0,
+        min=0)
+
+    updater_interval_days = bpy.props.IntProperty(
+        name='Days',
+        description="Number of days between checking for updates",
+        default=7,
+        min=0,
+        max=31)
+
+    updater_interval_hours = bpy.props.IntProperty(
+        name='Hours',
+        description="Number of hours between checking for updates",
+        default=0,
+        min=0,
+        max=23)
+
+    updater_interval_minutes = bpy.props.IntProperty(
+        name='Minutes',
+        description="Number of minutes between checking for updates",
+        default=0,
+        min=0,
+        max=59)
 
     def draw(self, context):
         layout = self.layout
-        layout.label(text="Update Addon")
-
-        # File selector for the ZIP file
-        layout.prop(self, "update_filepath")
-
-        # Button to trigger the update
-        layout.operator("wm.update_addon", text="Update Addon")
-
-class WM_OT_UpdateAddon(bpy.types.Operator):
-    bl_idname = "wm.update_addon"
-    bl_label = "Update Addon"
-
-    def execute(self, context):
-        preferences = context.preferences.addons.get("SetupAuto").preferences
-
-        # Get the path to the selected ZIP file
-        zip_path = preferences.update_filepath
-
-        if not zip_path:
-            self.report({'ERROR'}, "No ZIP file selected!")
-            return {'CANCELLED'}
-
-        # Get the directory of the current addon
-        addon_dir = os.path.dirname(os.path.realpath(__file__))
-
-        try:
-            # Create a backup of the current addon
-            backup_dir = addon_dir + "_backup"
-            if os.path.exists(backup_dir):
-                shutil.rmtree(backup_dir)
-            shutil.copytree(addon_dir, backup_dir)
-
-            # Extract the ZIP file
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                zip_ref.extractall(addon_dir)
-
-            self.report({'INFO'}, "Addon updated successfully! Backup created at: " + backup_dir)
-
-            # Reload the addon to apply changes
-            bpy.ops.script.reload()
-
-            return {'FINISHED'}
-        except Exception as e:
-            self.report({'ERROR'}, f"Failed to update addon: {str(e)}")
-            return {'CANCELLED'}
+        
+        # Update section
+        box = layout.box()
+        box.label(text="Update Addon", icon='FILE_REFRESH')
+        
+        # Display current version
+        row = box.row()
+        row.label(text=f"Current Version: {bl_info['version'][0]}.{bl_info['version'][1]}.{bl_info['version'][2]}")
+        
+        # Display repository info
+        row = box.row()
+        row.label(text=f"Repository: {bl_info['git_url']}")
+        
+        row = box.row()
+        row.label(text=f"Branch: {bl_info['git_branch']}")
+        
+        # Addon updater UI - this provides the update functionality
+        addon_updater_ops.update_settings_ui(self, context)
+        
+        # Documentation links
+        box = layout.box()
+        box.label(text="Documentation & Support", icon='HELP')
+        
+        row = box.row()
+        row.operator("wm.url_open", text="GitHub Repository", icon='URL').url = bl_info['doc_url']
+        
+        row = box.row()
+        row.operator("wm.url_open", text="Report Issues", icon='URL').url = bl_info['tracker_url']
 
 
+#==============================================
 
-#==============================================        
 
 
 def register():
-    bpy.utils.register_class(MyAddonPreferences)
-    bpy.utils.register_class(WM_OT_UpdateAddon)
+    # Addon updater code and configurations.
+    # In case of a broken version, try to register the updater first so that
+    # users can revert back to a working version.
+    addon_updater_ops.register(bl_info)
+    
+    # Register preferences class
+    addon_updater_ops.make_annotations(SetupAutoPreferences)  # Avoid blender 2.8 warnings
+    bpy.utils.register_class(SetupAutoPreferences)
     
     # Register modules
     register_quicksort()
@@ -103,8 +123,11 @@ def register():
     bpy.types.Scene.tools_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_tools_props)
 
 def unregister():
-    bpy.utils.unregister_class(MyAddonPreferences)
-    bpy.utils.unregister_class(WM_OT_UpdateAddon)    
+    # Addon updater unregister
+    addon_updater_ops.unregister()
+    
+    # Unregister preferences class
+    bpy.utils.unregister_class(SetupAutoPreferences)
     
     # Unregister modules
     unregister_bgimage()
@@ -116,8 +139,8 @@ def unregister():
     del bpy.types.Scene.tools_props
 
 
-
 #==============================================
+
 
 
 if __name__ == "__main__":
