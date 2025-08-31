@@ -62,10 +62,3 @@ class SETUPAUTO_PG_bgimage_props (bpy.types.PropertyGroup):
         description = "Automatically detect resolution from loaded images instead of using manual settings",
         default = True
     )
-
-
-def register():
-    bpy.utils.register_class(SETUPAUTO_PG_bgimage_props)
-
-def unregister():
-    bpy.utils.unregister_class(SETUPAUTO_PG_bgimage_props)

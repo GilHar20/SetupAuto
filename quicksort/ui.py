@@ -48,11 +48,3 @@ class SETUPAUTO_PT_quicksort_panel(bpy.types.Panel):
         row8 = box1.row()
         row8.alignment = 'CENTER'
         row8.operator('setupauto.ot_quicksort', text = "Quick Sort!")
-
-
-
-def register():
-    bpy.utils.register_class(SETUPAUTO_PT_quicksort_panel)
-
-def unregister():
-    bpy.utils.unregister_class(SETUPAUTO_PT_quicksort_panel)

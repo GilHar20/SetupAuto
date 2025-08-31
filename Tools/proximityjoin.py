@@ -49,11 +49,3 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
         print(f"Joined {len([c for c in clusters if len(c) > 1])} clusters.")
 
         return {'FINISHED'}
-
-
-
-def register():
-    bpy.utils.register_class(SETUPAUTO_OT_proxjoin)
-
-def unregister():
-    bpy.utils.unregister_class(SETUPAUTO_OT_proxjoin)

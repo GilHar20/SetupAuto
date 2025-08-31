@@ -13,11 +13,3 @@ class SETUPAUTO_OT_singleuser(bpy.types.Operator):
             # Make the object data (like mesh, curve, etc.) single user
             if obj.data and obj.data.users > 1:
                 obj.data = obj.data.copy()
-
-
-
-def register():
-    bpy.utils.register_class(SETUPAUTO_OT_singleuser)
-
-def unregister():
-    bpy.utils.unregister_class(SETUPAUTO_OT_singleuser)

@@ -32,11 +32,3 @@ class SETUPAUTO_PT_tools_panel(bpy.types.Panel):
         row3.prop(toolprops, "proximity")
         row4 = box3.row()
         row4.operator('setupauto.ot_proxjoin', text = "Join By Proximity")
-
-
-
-def register():
-    bpy.utils.register_class(SETUPAUTO_PT_tools_panel)
-
-def unregister():
-    bpy.utils.unregister_class(SETUPAUTO_PT_tools_panel)
