@@ -14,13 +14,20 @@ class SETUPAUTO_PG_quicksort_props (bpy.types.PropertyGroup):
     )
 
     pattern_action : bpy.props.EnumProperty(
-        name = "PatternMethod",
+        name = "Pattern Method",
         description = "Operation to perform on objects selected by the pattern",
         items = [
         ('ORGANIZE', "Organize", "Organize objects"),
+        ('JOIN', "Join", "Join objects"),
         ('DELETE', "Delete", "Delete objects"),
         ],
         default = 'ORGANIZE'
+    )
+
+    parent_collection : bpy.props.PointerProperty(
+        name = "Parent Collection",
+        description = "Parent collection to link the new collection under. Leave empty to link to scene collection",
+        type = bpy.types.Collection
     )
 
 

@@ -12,6 +12,7 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
         tools_props = context.scene.tools_props
 
         selected = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        reselect = selected
         remaining = set(selected)  # Keep track of unclustered objects
         clusters = []
 
@@ -46,5 +47,7 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
             # Deselect all for next iteration
             bpy.ops.object.select_all(action='DESELECT')
 
+        for obj in reselect:
+            obj.select_set(True)
 
         return {'FINISHED'}

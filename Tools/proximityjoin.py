@@ -1,4 +1,5 @@
 import bpy
+from mathutils import Vector
 
 
 
@@ -14,6 +15,13 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
         selected = [obj for obj in context.selected_objects if obj.type == 'MESH']
         remaining = set(selected)  # Keep track of unclustered objects
         clusters = []
+        
+        # Create axis mask based on user selection
+        axis_mask = Vector((
+            1.0 if tools_props.proximity_x else 0.0,
+            1.0 if tools_props.proximity_y else 0.0, 
+            1.0 if tools_props.proximity_z else 0.0
+        ))
 
         while remaining:
             obj = remaining.pop()
@@ -22,10 +30,16 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
 
             while to_check:
                 current = to_check.pop()
-                current_loc = current.location
+                # Apply axis mask to current object's location
+                current_loc_masked = Vector(current.location) * axis_mask
 
-                close_objs = {other for other in remaining
-                            if (current_loc - other.location).length <= tools_props.proximity}
+                close_objs = set()
+                for other in remaining:
+                    # Apply axis mask to other object's location
+                    other_loc_masked = Vector(other.location) * axis_mask
+                    # Calculate distance only on selected axes
+                    if (current_loc_masked - other_loc_masked).length <= tools_props.proximity:
+                        close_objs.add(other)
 
                 cluster.extend(close_objs)
                 to_check.extend(close_objs)
