@@ -31,7 +31,7 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
                     linked_obj.select_set(True)
                 
                 # Apply transforms to all linked objects at once
-                bpy.ops.object.transform_apply(tools_props.location, tools_props.rotation, tools_props.scale)
+                bpy.ops.object.transform_apply(location=tools_props.location, rotation=tools_props.rotation, scale=tools_props.scale)
                 
                 # Remove all linked objects from the remaining set
                 for linked_obj in linked_objects:
@@ -40,7 +40,7 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
             else:
                 # Single object, no linked data
                 obj.select_set(True)
-                bpy.ops.object.transform_apply(tools_props.location, tools_props.rotation, tools_props.scale)
+                bpy.ops.object.transform_apply(location=tools_props.location, rotation=tools_props.rotation, scale=tools_props.scale)
                 remaining.remove(obj)
             
             # Deselect all for next iteration

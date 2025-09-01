@@ -11,6 +11,6 @@ class SETUPAUTO_OT_purgeunused(bpy.types.Operator):
     def execute(self, context):
         tools_props = context.scene.tools_props
 
-        bpy.ops.outliner.orphans_purge(tools_props.do_local, tools_props.do_linked, tools_props.do_recursive)
+        bpy.ops.outliner.orphans_purge(do_local=tools_props.do_local, do_linked=tools_props.do_linked, do_recursive=tools_props.do_recursive)
         
         return {'FINISHED'}
