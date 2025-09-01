@@ -29,8 +29,24 @@ class AutoRegistration:
         print(f"Found addon module: {addon_module}")
         print(f"Module attributes: {[attr for attr in dir(addon_module) if not attr.startswith('_')]}")
             
-        # Get all submodules
-        submodules = self._get_submodules(addon_module)
+        # Get all submodules - improved approach
+        submodules = []
+        
+        # Look for specific imported submodules
+        submodule_names = ['quicksort', 'bgimage', 'Tools']
+        for submodule_name in submodule_names:
+            if hasattr(addon_module, submodule_name):
+                submodule = getattr(addon_module, submodule_name)
+                if inspect.ismodule(submodule):
+                    submodules.append(submodule)
+                    print(f"    Found submodule: {submodule.__name__}")
+        
+        # Also try the recursive approach as fallback
+        additional_submodules = self._get_submodules(addon_module)
+        for submodule in additional_submodules:
+            if submodule not in submodules:
+                submodules.append(submodule)
+        
         print(f"Found submodules: {[m.__name__ for m in submodules]}")
         
         # Discover classes from each submodule
@@ -67,18 +83,6 @@ class AutoRegistration:
                     
                     # Recursively get submodules of this submodule
                     submodules.extend(self._get_submodules(obj))
-        
-        # Also check for modules that might have been imported directly
-        # This handles cases where the module structure is different
-        if hasattr(module, 'quicksort'):
-            submodules.append(module.quicksort)
-            print(f"    Found imported submodule: quicksort")
-        if hasattr(module, 'bgimage'):
-            submodules.append(module.bgimage)
-            print(f"    Found imported submodule: bgimage")
-        if hasattr(module, 'Tools'):
-            submodules.append(module.Tools)
-            print(f"    Found imported submodule: Tools")
         
         return submodules
     
@@ -233,7 +237,7 @@ class AutoRegistration:
         }
 
 # Global instance
-auto_reg = AutoRegistration(__name__)
+auto_reg = AutoRegistration("SetupAuto")
 
 def register():
     """Register all classes automatically."""
