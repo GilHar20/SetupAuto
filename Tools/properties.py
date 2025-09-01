@@ -10,8 +10,29 @@ class SETUPAUTO_PG_tools_props (bpy.types.PropertyGroup):
         min = 0.1,
         max = 1000
     )
+    
+    # Proximity Join Axis Selection
+    proximity_x : bpy.props.BoolProperty(
+        name = "Proximity X",
+        description = "Consider X axis for proximity calculation",
+        default = True
+    )
+    
+    proximity_y : bpy.props.BoolProperty(
+        name = "Proximity Y", 
+        description = "Consider Y axis for proximity calculation",
+        default = True
+    )
 
-    # P urge Unsused Data Properties
+    proximity_z : bpy.props.BoolProperty(
+        name = "Proximity Z",
+        description = "Consider Z axis for proximity calculation", 
+        default = True
+    )
+
+
+
+    # Purge Unsused Data Properties
     do_local : bpy.props.BoolProperty(
         name = "Do Local Data",
         default= True
@@ -26,6 +47,8 @@ class SETUPAUTO_PG_tools_props (bpy.types.PropertyGroup):
         name = "Do Recursive Data",
         default= True
     )
+
+
 
     # Smart Apply Properties
     location : bpy.props.BoolProperty(

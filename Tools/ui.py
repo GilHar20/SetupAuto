@@ -16,13 +16,24 @@ class SETUPAUTO_PT_tools_panel(bpy.types.Panel):
 
         # Join Seperate section
         boxjoin = layout.box()
-        boxjoin.label(text="Join Seperate Tools")
+        boxjoin.label(text="Join and Seperate Tools")
+
+        # Proximity Join
         row1 = boxjoin.row()
+        row1a = row1.column()
+        row1a.label(text="Proximity Join Axis:")
+        row1b = row1.column()
+        row1b.prop(toolprops, "proximity_x", text="X")
+        row1c = row1.column()
+        row1c.prop(toolprops, "proximity_y", text="Y")
+        row1d = row1.column()
+        row1d.prop(toolprops, "proximity_z", text="Z")
         column1 = row1.column()
         column1.prop(toolprops, "proximity")
         column2 = row1.column()
         column2.operator('setupauto.ot_proxjoin', text = "Join By Proximity")
 
+        # Grid Split
         row2 = boxjoin.row()
         row2.label(text="Add Grid Split/Join Tool Here")
 
