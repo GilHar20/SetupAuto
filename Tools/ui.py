@@ -14,21 +14,45 @@ class SETUPAUTO_PT_tools_panel(bpy.types.Panel):
         layout = self.layout
         toolprops = context.scene.tools_props
 
-        box1 = layout.box()
-        box2.label(text="Single User")
-        row1 = box1.row()
-        row1.operator('setupauto.ot_singleuser', text = "Make Single Users")
+        # Join Seperate section
+        boxjoin = layout.box()
+        boxjoin.label(text="Join Seperate Tools")
+        row1 = boxjoin.row()
+        column1 = row1.column()
+        column1.prop(toolprops, "proximity")
+        column2 = row1.column()
+        column2.operator('setupauto.ot_proxjoin', text = "Join By Proximity")
 
-        # Duplicates section
-        box2 = layout.box()
-        box2.label(text="Duplicate to Instances")
-        row2 = box2.row()
-        row2.operator('setupauto.ot_dups2inst', text = "Link Duplicates")
+        row2 = boxjoin.row()
+        row2.label(text="Add Grid Split/Join Tool Here")
 
-        # Proximity section
-        box3 = layout.box()
-        box3.label(text="Proximity Join")
-        row3 = box3.row()
-        row3.prop(toolprops, "proximity")
-        row4 = box3.row()
-        row4.operator('setupauto.ot_proxjoin', text = "Join By Proximity")
+
+
+        # Instances section
+        boxInst = layout.box()
+        boxInst.label(text="Instances Tools")
+        row1 = boxInst.row()
+        row1.operator('setupauto.ot_dups2inst', text = "Duplicate to Instances")
+
+        row2a = boxInst.row()
+        row2a.label(text="Smart Apply Transforms:")
+        row2b = boxInst.row()
+        col1 = row2b.column()
+        col1.alignment = 'LEFT'
+        col1.prop(toolprops, "location", text="Location")
+        col2 = row2b.column()
+        col2.alignment = 'CENTER'
+        col2.prop(toolprops, "rotation", text="Rotation")
+        col3 = row2b.column()
+        col3.alignment = 'RIGHT'
+        col3.prop(toolprops, "scale", text="Scale")
+        row2c = boxInst.row()
+        row2c.operator('setupauto.ot_smartapply', text = "Smart Apply")
+
+
+
+        row3 = boxInst.row()
+        row3.operator('setupauto.ot_singleuser', text = "Make Single Users")
+
+        row4 = boxInst.row()
+        row4.operator('setupauto.ot_purgeunused', text="Purge Unused Data")

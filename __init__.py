@@ -108,8 +108,57 @@ def register():
     addon_updater_ops.make_annotations(SetupAutoPreferences)  # Avoid blender 2.8 warnings
     bpy.utils.register_class(SetupAutoPreferences)
     
+    # TEMPORARY: Manual registration instead of auto-registration
+    print("Manual registration starting...")
+    
+    # Import and register all classes manually
+    from .quicksort.ui import SETUPAUTO_PT_quicksort_panel
+    from .quicksort.operator import SETUPAUTO_OT_quicksort
+    from .quicksort.properties import SETUPAUTO_PG_quicksort_props, SETUPAUTO_OT_add_pattern, SETUPAUTO_OT_remove_pattern
+    
+    from .bgimage.ui import SETUPAUTO_PT_bgimage_panel
+    from .bgimage.operator import SETUPAUTO_OT_bgimage
+    from .bgimage.properties import SETUPAUTO_PG_bgimage_props
+    
+    from .Tools.ui import SETUPAUTO_PT_tools_panel
+    from .Tools.properties import SETUPAUTO_PG_tools_props
+    from .Tools.proximityjoin import SETUPAUTO_OT_proxjoin
+    from .Tools.duplicates2instances import SETUPAUTO_OT_dups2inst
+    from .Tools.smartapply import SETUPAUTO_OT_smartapply
+    from .Tools.singleuser import SETUPAUTO_OT_singleuser
+    from .Tools.purgeunused import SETUPAUTO_OT_purgeunused
+    
+    # Register PropertyGroups first
+    bpy.utils.register_class(SETUPAUTO_PG_quicksort_props)
+    bpy.utils.register_class(SETUPAUTO_PG_bgimage_props)
+    bpy.utils.register_class(SETUPAUTO_PG_tools_props)
+    
+    # Register UI panels
+    bpy.utils.register_class(SETUPAUTO_PT_quicksort_panel)
+    bpy.utils.register_class(SETUPAUTO_PT_bgimage_panel)
+    bpy.utils.register_class(SETUPAUTO_PT_tools_panel)
+    
+    # Register operators
+    
+    bpy.utils.register_class(SETUPAUTO_OT_add_pattern)
+    bpy.utils.register_class(SETUPAUTO_OT_remove_pattern)
+    bpy.utils.register_class(SETUPAUTO_OT_quicksort)
+    bpy.utils.register_class(SETUPAUTO_OT_bgimage)
+    bpy.utils.register_class(SETUPAUTO_OT_proxjoin)
+    bpy.utils.register_class(SETUPAUTO_OT_dups2inst)
+    bpy.utils.register_class(SETUPAUTO_OT_smartapply)
+    bpy.utils.register_class(SETUPAUTO_OT_singleuser)
+    bpy.utils.register_class(SETUPAUTO_OT_purgeunused)
+    
+    # Register properties
+    bpy.types.Scene.pattern_props = bpy.props.CollectionProperty(type=SETUPAUTO_PG_quicksort_props)
+    bpy.types.Scene.bgimage_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_bgimage_props)
+    bpy.types.Scene.tools_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_tools_props)
+    
+    print("Manual registration complete!")
+    
     # Use auto-registration system for all classes (including addon updater)
-    auto_registration.register()
+    # auto_registration.register()
     
     # Configure addon updater (after classes are registered)
     addon_updater_ops.register(bl_info)
@@ -121,8 +170,59 @@ def unregister():
     # Unregister preferences class (not part of auto-registration)
     bpy.utils.unregister_class(SetupAutoPreferences)
     
+    # Manual unregistration
+    print("Manual unregistration starting...")
+    
+    # Unregister properties first
+    if hasattr(bpy.types.Scene, 'pattern_props'):
+        delattr(bpy.types.Scene, 'pattern_props')
+    if hasattr(bpy.types.Scene, 'bgimage_props'):
+        delattr(bpy.types.Scene, 'bgimage_props')
+    if hasattr(bpy.types.Scene, 'tools_props'):
+        delattr(bpy.types.Scene, 'tools_props')
+    
+    # Unregister operators
+    from .Tools.purgeunused import SETUPAUTO_OT_purgeunused
+    from .Tools.singleuser import SETUPAUTO_OT_singleuser
+    from .Tools.smartapply import SETUPAUTO_OT_smartapply
+    from .Tools.duplicates2instances import SETUPAUTO_OT_dups2inst
+    from .Tools.proximityjoin import SETUPAUTO_OT_proxjoin
+    from .bgimage.operator import SETUPAUTO_OT_bgimage
+    from .quicksort.operator import SETUPAUTO_OT_quicksort
+    from .quicksort.properties import SETUPAUTO_OT_add_pattern, SETUPAUTO_OT_remove_pattern
+    
+    bpy.utils.unregister_class(SETUPAUTO_OT_purgeunused)
+    bpy.utils.unregister_class(SETUPAUTO_OT_singleuser)
+    bpy.utils.unregister_class(SETUPAUTO_OT_smartapply)
+    bpy.utils.unregister_class(SETUPAUTO_OT_dups2inst)
+    bpy.utils.unregister_class(SETUPAUTO_OT_proxjoin)
+    bpy.utils.unregister_class(SETUPAUTO_OT_bgimage)
+    bpy.utils.unregister_class(SETUPAUTO_OT_quicksort)
+    bpy.utils.unregister_class(SETUPAUTO_OT_add_pattern)
+    bpy.utils.unregister_class(SETUPAUTO_OT_remove_pattern)
+    
+    # Unregister UI panels
+    from .Tools.ui import SETUPAUTO_PT_tools_panel
+    from .bgimage.ui import SETUPAUTO_PT_bgimage_panel
+    from .quicksort.ui import SETUPAUTO_PT_quicksort_panel
+    
+    bpy.utils.unregister_class(SETUPAUTO_PT_tools_panel)
+    bpy.utils.unregister_class(SETUPAUTO_PT_bgimage_panel)
+    bpy.utils.unregister_class(SETUPAUTO_PT_quicksort_panel)
+    
+    # Unregister PropertyGroups
+    from .Tools.properties import SETUPAUTO_PG_tools_props
+    from .bgimage.properties import SETUPAUTO_PG_bgimage_props
+    from .quicksort.properties import SETUPAUTO_PG_quicksort_props
+    
+    bpy.utils.unregister_class(SETUPAUTO_PG_tools_props)
+    bpy.utils.unregister_class(SETUPAUTO_PG_bgimage_props)
+    bpy.utils.unregister_class(SETUPAUTO_PG_quicksort_props)
+    
+    print("Manual unregistration complete!")
+    
     # Use auto-registration system to unregister all classes
-    auto_registration.unregister()
+    # auto_registration.unregister()
 
 
 #==============================================

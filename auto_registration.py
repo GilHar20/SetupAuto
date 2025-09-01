@@ -18,21 +18,32 @@ class AutoRegistration:
         
     def discover_classes(self) -> None:
         """Discover all classes from all modules in the addon."""
+        print(f"Starting class discovery for addon: {self.addon_name}")
+        
         # Get the addon module
         addon_module = sys.modules.get(self.addon_name)
         if not addon_module:
             print(f"Warning: Addon module {self.addon_name} not found")
             return
             
+        print(f"Found addon module: {addon_module}")
+        print(f"Module attributes: {[attr for attr in dir(addon_module) if not attr.startswith('_')]}")
+            
         # Get all submodules
         submodules = self._get_submodules(addon_module)
+        print(f"Found submodules: {[m.__name__ for m in submodules]}")
         
         # Discover classes from each submodule
         for module in submodules:
+            print(f"Discovering classes from module: {module.__name__}")
             self._discover_classes_from_module(module)
             
         # Also discover classes from addon updater modules
         self._discover_addon_updater_classes()
+        
+        print(f"Class discovery complete. Found {len(self.classes)} classes and {len(self.property_groups)} PropertyGroups")
+        print(f"Classes: {[cls.__name__ for cls in self.classes]}")
+        print(f"PropertyGroups: {list(self.property_groups.keys())}")
     
     def _get_submodules(self, module) -> List:
         """Get all submodules of the addon."""
@@ -52,14 +63,28 @@ class AutoRegistration:
                 # Check if it's a submodule of our addon
                 if hasattr(obj, '__name__') and obj.__name__.startswith(self.addon_name):
                     submodules.append(obj)
+                    print(f"    Found submodule: {obj.__name__}")
                     
                     # Recursively get submodules of this submodule
                     submodules.extend(self._get_submodules(obj))
+        
+        # Also check for modules that might have been imported directly
+        # This handles cases where the module structure is different
+        if hasattr(module, 'quicksort'):
+            submodules.append(module.quicksort)
+            print(f"    Found imported submodule: quicksort")
+        if hasattr(module, 'bgimage'):
+            submodules.append(module.bgimage)
+            print(f"    Found imported submodule: bgimage")
+        if hasattr(module, 'Tools'):
+            submodules.append(module.Tools)
+            print(f"    Found imported submodule: Tools")
         
         return submodules
     
     def _discover_classes_from_module(self, module) -> None:
         """Discover all Blender classes from a module."""
+        module_classes = []
         for name in dir(module):
             obj = getattr(module, name)
             
@@ -68,6 +93,12 @@ class AutoRegistration:
                 # Check if it's a Blender class
                 if self._is_blender_class(obj):
                     self._categorize_class(obj)
+                    module_classes.append(obj.__name__)
+        
+        if module_classes:
+            print(f"  Found classes in {module.__name__}: {module_classes}")
+        else:
+            print(f"  No classes found in {module.__name__}")
     
     def _discover_addon_updater_classes(self) -> None:
         """Discover classes from addon updater modules."""
@@ -133,9 +164,6 @@ class AutoRegistration:
         """Register all discovered classes."""
         print(f"Auto-registering {len(self.classes)} classes and {len(self.property_groups)} PropertyGroups...")
         
-        # Set flag to indicate auto-registration is active
-        bpy.context.auto_registration_active = True
-        
         # First register PropertyGroups
         for class_name, cls in self.property_groups.items():
             try:
@@ -169,6 +197,8 @@ class AutoRegistration:
                     print(f"Registered property: {target.__name__}.{prop_name} ({prop_type})")
                 except Exception as e:
                     print(f"Error registering property {target.__name__}.{prop_name}: {e}")
+        
+        print("Registration complete!")
     
     def unregister(self) -> None:
         """Unregister all registered classes."""
@@ -193,10 +223,6 @@ class AutoRegistration:
                 print(f"Unregistered {cls.__name__}")
             except Exception as e:
                 print(f"Error unregistering {cls.__name__}: {e}")
-        
-        # Clear auto-registration flag
-        if hasattr(bpy.context, 'auto_registration_active'):
-            delattr(bpy.context, 'auto_registration_active')
     
     def get_registration_info(self) -> Dict[str, List[str]]:
         """Get information about what will be registered."""
