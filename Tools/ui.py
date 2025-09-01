@@ -49,10 +49,20 @@ class SETUPAUTO_PT_tools_panel(bpy.types.Panel):
         row2c = boxInst.row()
         row2c.operator('setupauto.ot_smartapply', text = "Smart Apply")
 
-
-
         row3 = boxInst.row()
         row3.operator('setupauto.ot_singleuser', text = "Make Single Users")
 
+        row4a = boxInst.row()
+        row4a.label(text="Smart Apply Transforms:")
+        row4b = boxInst.row()
+        col4 = row4b.column()
+        col4.alignment = 'LEFT'
+        col4.prop(toolprops, "do_local", text="Do Local")
+        col5 = row4b.column()
+        col5.alignment = 'CENTER'
+        col5.prop(toolprops, "do_linked", text="Do Linked")
+        col6 = row4b.column()
+        col6.alignment = 'RIGHT'
+        col6.prop(toolprops, "do_recursive", text="Do Recursive")
         row4 = boxInst.row()
         row4.operator('setupauto.ot_purgeunused', text="Purge Unused Data")
