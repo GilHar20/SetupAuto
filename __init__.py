@@ -112,12 +112,29 @@ def register():
     # Use auto-load system for all classes
     auto_load.register()
     
+    # Register properties to Scene (auto-load doesn't handle this)
+    from .quicksort.properties import SETUPAUTO_PG_quicksort_props
+    from .bgimage.properties import SETUPAUTO_PG_bgimage_props
+    from .Tools.properties import SETUPAUTO_PG_tools_props
+    
+    bpy.types.Scene.pattern_props = bpy.props.CollectionProperty(type=SETUPAUTO_PG_quicksort_props)
+    bpy.types.Scene.bgimage_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_bgimage_props)
+    bpy.types.Scene.tools_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_tools_props)
+    
     # Configure addon updater (after classes are registered)
     addon_updater_ops.register(bl_info)
 
 def unregister():
     # Addon updater unregister (before classes are unregistered)
     addon_updater_ops.unregister()
+    
+    # Unregister properties from Scene (reverse order)
+    if hasattr(bpy.types.Scene, 'tools_props'):
+        delattr(bpy.types.Scene, 'tools_props')
+    if hasattr(bpy.types.Scene, 'bgimage_props'):
+        delattr(bpy.types.Scene, 'bgimage_props')
+    if hasattr(bpy.types.Scene, 'pattern_props'):
+        delattr(bpy.types.Scene, 'pattern_props')
     
     # Unregister preferences class (not part of auto-load)
     bpy.utils.unregister_class(SetupAutoPreferences)

@@ -32,6 +32,9 @@ def register():
     for module in modules:
         if module.__name__ == __name__:
             continue
+        # Skip addon updater modules - they are handled manually
+        if "addon_updater" in module.__name__:
+            continue
         if hasattr(module, "register"):
             module.register()
 
@@ -41,6 +44,9 @@ def unregister():
 
     for module in modules:
         if module.__name__ == __name__:
+            continue
+        # Skip addon updater modules - they are handled manually
+        if "addon_updater" in module.__name__:
             continue
         if hasattr(module, "unregister"):
             module.unregister()
@@ -115,6 +121,9 @@ def iter_my_classes(modules):
     for cls in get_classes_in_modules(modules):
         if any(base in base_types for base in cls.__bases__):
             if not getattr(cls, "is_registered", False):
+                # Skip addon updater classes - they are handled manually
+                if hasattr(cls, '__module__') and "addon_updater" in cls.__module__:
+                    continue
                 yield cls
 
 def get_classes_in_modules(modules):
