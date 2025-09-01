@@ -37,33 +37,30 @@ class SETUPAUTO_PT_quicksort_panel(bpy.types.Panel):
         if len(patternprops) > 0:
             row_buttons.operator("setupauto.remove_pattern", text="Remove Pattern", icon='REMOVE')
 
-        # Ensure there's at least one pattern item
-        if len(patternprops) == 0:
-            # Add a default pattern if none exists
-            patternprops.add()
-
         # Draw pattern properties for each item in the collection - each in its own box
-        for i, pattern_item in enumerate(patternprops):
-            # Create individual box for each pattern item
-            pattern_box = boxsort.box()
-            pattern_header = pattern_box.row()
-            pattern_header.label(text=f"Pattern #{i+1}")
-            
-            # Action and parent collection properties on the same row
-            row_action = pattern_box.row()
-            column_action = row_action.column(align=True)
-            column_action.prop(pattern_item, "pattern_action", text="Action")
-            
-            column_parent = row_action.column(align=True)
-            column_parent.prop(pattern_item, "parent_collection", text="Parent")
-            
-            # Name and sample properties on the second row
-            row1 = pattern_box.row()
-            column1 = row1.column(align=True)
-            column1.prop(pattern_item, "pattern_name", text="Name")
-            
-            column2 = row1.column(align=True)
-            column2.prop(pattern_item, "pattern_sample", text="Sample")
+        # Only draw if there are patterns
+        if len(patternprops) > 0:
+            for i, pattern_item in enumerate(patternprops):
+                # Create individual box for each pattern item
+                pattern_box = boxsort.box()
+                pattern_header = pattern_box.row()
+                pattern_header.label(text=f"Pattern #{i+1}")
+                
+                # Action and parent collection properties on the same row
+                row_action = pattern_box.row()
+                column_action = row_action.column(align=True)
+                column_action.prop(pattern_item, "pattern_action", text="Action")
+                
+                column_parent = row_action.column(align=True)
+                column_parent.prop(pattern_item, "parent_collection", text="Parent")
+                
+                # Name and sample properties on the second row
+                row1 = pattern_box.row()
+                column1 = row1.column(align=True)
+                column1.prop(pattern_item, "pattern_name", text="Name")
+                
+                column2 = row1.column(align=True)
+                column2.prop(pattern_item, "pattern_sample", text="Sample")
 
         row8 = boxsort.row()
         row8.alignment = 'CENTER'

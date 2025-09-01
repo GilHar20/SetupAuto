@@ -179,8 +179,9 @@ class SETUPAUTO_OT_patternsdetection(bpy.types.Operator):
                     # Get the newly added pattern
                     new_pattern = pattern_props[pattern_index]
                     
-                    # Set pattern_sample to the detected pattern
-                    new_pattern.pattern_sample = numeric_pattern["pattern"]
+                    # Clean up pattern and set pattern_sample
+                    cleaned_pattern = numeric_pattern["pattern"].replace("#", "").replace("[", "").replace("]", "")
+                    new_pattern.pattern_sample = cleaned_pattern
                     
                     # Leave pattern_name empty as requested
                     new_pattern.pattern_name = ""
@@ -197,8 +198,9 @@ class SETUPAUTO_OT_patternsdetection(bpy.types.Operator):
                 # Get the newly added pattern
                 new_pattern = pattern_props[pattern_index]
                 
-                # Set pattern_sample to the prefix pattern
-                new_pattern.pattern_sample = result_entry["prefix_pattern"]
+                # Clean up prefix pattern and set pattern_sample
+                cleaned_pattern = result_entry["prefix_pattern"].replace("#", "").replace("[", "").replace("]", "")
+                new_pattern.pattern_sample = cleaned_pattern
                 
                 # Leave pattern_name empty as requested
                 new_pattern.pattern_name = ""
