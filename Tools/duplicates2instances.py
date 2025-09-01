@@ -20,7 +20,7 @@ class SETUPAUTO_OT_dups2inst(bpy.types.Operator):
 
     def replace_with_instances(self):
         seen = {}
-        for obj in list(bpy.data.objects):
+        for obj in list(bpy.context.selected_objects):
             if obj.type != 'MESH':
                 continue
             key = self.mesh_hash(obj)
@@ -34,5 +34,8 @@ class SETUPAUTO_OT_dups2inst(bpy.types.Operator):
                 bpy.data.objects.remove(obj)
 
     def execute(self, context):
-        self.replace_with_instances()
+        if bpy.context.selected_objects:
+            self.replace_with_instances()
+        else:
+            self.report({'INFO'}, "No objects selected.")
         return {'FINISHED'}
