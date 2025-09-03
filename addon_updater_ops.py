@@ -1357,12 +1357,12 @@ def register(bl_info):
 
     # Choose your own repository, must match git name for GitHUb and Bitbucket,
     # for GitLab use project ID (numbers only).
-    updater.repo = "AutoSetup"
+    updater.repo = "SetupAuto"
 
     # updater.addon = # define at top of module, MUST be done first
 
     # Website for manual addon download, optional but recommended to set.
-    updater.website = "https://github.com/GilHar20/AutoSetup/"
+    updater.website = "https://github.com/GilHar20/SetupAuto/"
 
     # Addon subfolder path.
     # "sample/path/to/addon"
@@ -1460,7 +1460,7 @@ def register(bl_info):
     # Note: updater.include_branch_list defaults to ['master'] branch if set to
     # none. Example targeting another multiple branches allowed to pull from:
     # updater.include_branch_list = ['master', 'dev']
-    updater.include_branch_list = None  # None is the equivalent = ['master']
+    updater.include_branch_list = ['main']  # Use 'main' branch instead of default 'master'
 
     # Only allow manual install, thus prompting the user to open
     # the addon's web page to download, specifically: updater.website
