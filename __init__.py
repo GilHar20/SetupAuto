@@ -1,6 +1,6 @@
 bl_info = {
     "name": "SetupAuto",
-    "version": (1, 2, 0),
+    "version": (1, 4, 0),
     "blender": (4, 5, 0),
     "author": "Gilad Harnik",
     "location": "View3D > Tool Shelf",
@@ -16,10 +16,10 @@ bl_info = {
 import bpy
 
 # Import all modules to ensure classes are available for auto-registration
+from . import manager
 from . import quicksort
 from . import bgimage
 from . import Tools
-from . import manager
 
 # Import the addon updater (not part of auto-registration)
 from . import addon_updater_ops
