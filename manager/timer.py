@@ -332,21 +332,22 @@ class WorkTimeTracker:
         return f"{hours:02d}:{minutes:02d}"
 
 
-# Global tracker instance
-work_tracker = WorkTimeTracker.get_instance()
-
-
 @persistent
 def activity_handler(scene):
     """Handler to register activity when scene changes"""
     # Skip activity registration during file save/load operations
     if bpy.context.mode == 'OBJECT' and hasattr(bpy.context, 'window'):
+        # Get fresh instance each time to avoid stale references during updates
+        work_tracker = WorkTimeTracker.get_instance()
         work_tracker.register_activity()
 
 
 @persistent
 def load_handler(dummy):
     """Handler called when file is loaded"""
+    # Get fresh instance each time to avoid stale references during updates
+    work_tracker = WorkTimeTracker.get_instance()
+    
     # Reset tracker for new file
     work_tracker.current_file_path = None
     work_tracker.stop_tracking()
@@ -375,9 +376,12 @@ def register():
 
 def unregister():
     """Unregister handlers"""
-    # Stop tracking
+    # Stop tracking using fresh instance
     try:
+        work_tracker = WorkTimeTracker.get_instance()
         work_tracker.stop_tracking()
+        # Clear the singleton instance to prevent conflicts during updates
+        WorkTimeTracker._instance = None
     except Exception as e:
         print(f"SetupAuto timer stop_tracking error: {e}")
     
