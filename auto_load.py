@@ -35,6 +35,9 @@ def register():
         # Skip addon updater modules - they are handled manually
         if "addon_updater" in module.__name__:
             continue
+        # Skip timer module - handlers are registered manually in __init__.py
+        if "timer" in module.__name__:
+            continue
         if hasattr(module, "register"):
             module.register()
 
@@ -47,6 +50,9 @@ def unregister():
             continue
         # Skip addon updater modules - they are handled manually
         if "addon_updater" in module.__name__:
+            continue
+        # Skip timer module - handlers are unregistered manually in __init__.py
+        if "timer" in module.__name__:
             continue
         if hasattr(module, "unregister"):
             module.unregister()

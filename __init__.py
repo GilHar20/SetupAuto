@@ -124,12 +124,20 @@ def register():
     bpy.types.Scene.bgimage_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_bgimage_props)
     bpy.types.Scene.tools_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_tools_props)
     
+    # Register timer handlers manually after properties are available
+    from .manager import timer
+    timer.register()
+    
     # Configure addon updater (after classes are registered)
     addon_updater_ops.register(bl_info)
 
 def unregister():
     # Addon updater unregister (before classes are unregistered)
     addon_updater_ops.unregister()
+    
+    # Unregister timer handlers manually first
+    from .manager import timer
+    timer.unregister()
     
     # Unregister properties from Scene (reverse order)
     if hasattr(bpy.types.Scene, 'tools_props'):
