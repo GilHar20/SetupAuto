@@ -42,10 +42,6 @@ class SETUPAUTO_PT_quicksort_panel(bpy.types.Panel):
         row_sort_a.alignment = 'CENTER'
         row_sort_a.operator('setupauto.ot_quicksort', text = "Quick Sort!")
 
-        # If there are no patterns - add the first one
-        if len(patternprops) == 0:
-            bpy.ops.setupauto.add_pattern()
-
         # Draw pattern properties for each item in the collection - each in its own box    
         for i, pattern_item in enumerate(patternprops):
             # Create individual box for each pattern item
