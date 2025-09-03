@@ -6,7 +6,7 @@ from ..manager.timer import WorkTimeTracker
 class SETUPAUTO_PT_manager_panel(bpy.types.Panel):
     '''Class draws manager UI panel'''
     bl_idname = "setupauto.pt_manager_panel"
-    bl_label = "Project Manager"
+    bl_label = "Work Time Tracker"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "SetupAuto"

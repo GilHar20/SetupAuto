@@ -362,22 +362,31 @@ def load_handler(dummy):
 
 def register():
     """Register handlers for activity detection"""
-    # Register various handlers to detect user activity
-    if activity_handler not in bpy.app.handlers.depsgraph_update_post:
-        bpy.app.handlers.depsgraph_update_post.append(activity_handler)
+    # Ensure handlers are not already registered to prevent conflicts
+    unregister()  # Clean up any existing handlers first
     
-    if load_handler not in bpy.app.handlers.load_post:
+    # Register handlers
+    try:
+        bpy.app.handlers.depsgraph_update_post.append(activity_handler)
         bpy.app.handlers.load_post.append(load_handler)
+    except Exception as e:
+        print(f"SetupAuto timer register error: {e}")
 
 
 def unregister():
     """Unregister handlers"""
     # Stop tracking
-    work_tracker.stop_tracking()
+    try:
+        work_tracker.stop_tracking()
+    except Exception as e:
+        print(f"SetupAuto timer stop_tracking error: {e}")
     
-    # Remove handlers
-    if activity_handler in bpy.app.handlers.depsgraph_update_post:
-        bpy.app.handlers.depsgraph_update_post.remove(activity_handler)
-    
-    if load_handler in bpy.app.handlers.load_post:
-        bpy.app.handlers.load_post.remove(load_handler)
+    # Remove handlers safely - use while loop to handle multiple instances
+    try:
+        while activity_handler in bpy.app.handlers.depsgraph_update_post:
+            bpy.app.handlers.depsgraph_update_post.remove(activity_handler)
+        
+        while load_handler in bpy.app.handlers.load_post:
+            bpy.app.handlers.load_post.remove(load_handler)
+    except Exception as e:
+        print(f"SetupAuto timer unregister error: {e}")
