@@ -11,10 +11,8 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
     def execute(self, context):
         tools_props = context.scene.tools_props
 
-        selected = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        reselect = selected
+        selected = context.selected_objects
         remaining = set(selected)  # Keep track of unclustered objects
-        clusters = []
 
         bpy.ops.object.select_all(action='DESELECT')
 
@@ -25,29 +23,30 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
             # Check if this object has linked data
             if obj.data and obj.data.users > 1:
                 # Find all objects with the same linked data
-                linked_objects = [o for o in bpy.data.objects if o.data == obj.data]
+                linked_cluster = [linked for linked in remaining if linked.data == obj.data]
                 
                 # Select all linked objects
-                for linked_obj in linked_objects:
+                for linked_obj in linked_cluster:
                     linked_obj.select_set(True)
+
+                bpy.context.view_layer.objects.active = linked_cluster[0]
                 
                 # Apply transforms to all linked objects at once
                 bpy.ops.object.transform_apply(location=tools_props.location, rotation=tools_props.rotation, scale=tools_props.scale)
                 
                 # Remove all linked objects from the remaining set
-                for linked_obj in linked_objects:
-                    if linked_obj in remaining:
-                        remaining.remove(linked_obj)
+                for linked_obj in linked_cluster:
+                    remaining.remove(linked_obj)
             else:
                 # Single object, no linked data
-                obj.select_set(True)
+                bpy.context.view_layer.objects.active = obj
                 bpy.ops.object.transform_apply(location=tools_props.location, rotation=tools_props.rotation, scale=tools_props.scale)
                 remaining.remove(obj)
             
             # Deselect all for next iteration
             bpy.ops.object.select_all(action='DESELECT')
 
-        for obj in reselect:
+        for obj in selected:
             obj.select_set(True)
 
         return {'FINISHED'}
