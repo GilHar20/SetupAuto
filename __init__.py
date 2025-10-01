@@ -15,17 +15,12 @@ bl_info = {
 
 import bpy
 
-# Import all modules to ensure classes are available for auto-registration
-from . import manager
 from . import quicksort
 from . import bgimage
 from . import Tools
 
 # Import the addon updater (not part of auto-registration)
 from . import addon_updater_ops
-
-# Import the auto-load system
-from . import auto_load
 
 
 #==============================================
@@ -102,32 +97,17 @@ class SetupAutoPreferences(bpy.types.AddonPreferences):
 
 #==============================================
 
-# Initialize auto-load system
-auto_load.init()
+
 
 def register():
     # Register preferences class (not part of auto-load)
     addon_updater_ops.make_annotations(SetupAutoPreferences)  # Avoid blender 2.8 warnings
     bpy.utils.register_class(SetupAutoPreferences)
     
-    # Use auto-load system for all classes
-    auto_load.register()
-    
-    # Register properties to Scene (auto-load doesn't handle this)
-    from .manager.properties import SETUPAUTO_PG_manager_props    
-    from .quicksort.properties import SETUPAUTO_PG_quicksort_props
-    from .bgimage.properties import SETUPAUTO_PG_bgimage_props
-    from .Tools.properties import SETUPAUTO_PG_tools_props
-    
-    bpy.types.Scene.manager_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_manager_props)
-    bpy.types.Scene.pattern_props = bpy.props.CollectionProperty(type=SETUPAUTO_PG_quicksort_props)
-    bpy.types.Scene.bgimage_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_bgimage_props)
-    bpy.types.Scene.tools_props = bpy.props.PointerProperty(type=SETUPAUTO_PG_tools_props)
-    
-    # Register timer handlers manually after properties are available
-    from .manager import timer
-    timer.register()
-    
+    quicksort.register()
+    bgimage.register()
+    Tools.register()
+
     # Configure addon updater (after classes are registered)
     addon_updater_ops.register(bl_info)
 
@@ -135,25 +115,12 @@ def unregister():
     # Addon updater unregister (before classes are unregistered)
     addon_updater_ops.unregister()
     
-    # Unregister timer handlers manually first
-    from .manager import timer
-    timer.unregister()
-    
-    # Unregister properties from Scene (reverse order)
-    if hasattr(bpy.types.Scene, 'tools_props'):
-        delattr(bpy.types.Scene, 'tools_props')
-    if hasattr(bpy.types.Scene, 'bgimage_props'):
-        delattr(bpy.types.Scene, 'bgimage_props')
-    if hasattr(bpy.types.Scene, 'pattern_props'):
-        delattr(bpy.types.Scene, 'pattern_props')
-    if hasattr(bpy.types.Scene, 'manager_props'):
-        delattr(bpy.types.Scene, 'manager_props')
+    quicksort.unregister()
+    bgimage.unregister()
+    Tools.unregister()
     
     # Unregister preferences class (not part of auto-load)
     bpy.utils.unregister_class(SetupAutoPreferences)
-    
-    # Use auto-load system to unregister all classes
-    auto_load.unregister()
 
 
 #==============================================
