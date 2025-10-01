@@ -5,6 +5,8 @@ from . import properties, operator, patternsdetection, ui
 
 classes = [
     properties.SETUPAUTO_PG_quicksort_props,
+    properties.SETUPAUTO_OT_add_pattern,
+    properties.SETUPAUTO_OT_remove_pattern,
     operator.SETUPAUTO_OT_quicksort,
     patternsdetection.SETUPAUTO_OT_patternsdetection,
     ui.SETUPAUTO_PT_quicksort_panel
