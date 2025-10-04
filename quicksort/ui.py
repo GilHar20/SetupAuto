@@ -13,14 +13,9 @@ class SETUPAUTO_PT_quicksort_panel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         pattern_props = context.scene.pattern_props
-        
-        # Pattern Detection box:
-        boxDetection = layout.box()
-        boxDetection.label(text="Pattern Detection")
-        
-        rowDetection = boxDetection.row()
-        rowDetection.operator('setupauto.ot_patternsdetection', text="Detect Patterns!")
-        
+        quicksort_props = context.scene.quicksort_props
+
+
         # quick sort settings:
         boxSort = layout.box()
         boxSort.label(text = "Quick Sort")
@@ -28,13 +23,23 @@ class SETUPAUTO_PT_quicksort_panel(bpy.types.Panel):
         rowLabel = boxSort.row()
         rowLabel.label(text=f"Number of patterns: {len(pattern_props)}")
         
-        rowAddRemove = boxSort.row(align=True)
+        columnCollection = boxSort.column(align=True)
+
+        rowCollection = columnCollection.row()
+        rowCollection.prop(quicksort_props, "main_collection", text="Main Collection")
+
+        rowAddRemove = columnCollection.row(align=True)
         rowAddRemove.operator("setupauto.add_pattern", text="Add Pattern", icon='ADD')
         rowAddRemove.operator("setupauto.remove_pattern", text="Remove Pattern", icon='REMOVE')
 
-        # Draw sort button
+        rowDetection = columnCollection.row()
+        rowDetection.operator('setupauto.ot_patternsdetection', text="Detect Patterns!")
+
+        columnCollection.operator("setupauto.clear_patterns", text="Clear All Paterns", icon='TRASH')
+
         rowSort = boxSort.row()
         rowSort.operator('setupauto.ot_quicksort', text = "Quick Sort!")
+
 
         # Draw pattern properties for each item in the collection - each in its own box    
         for i, pattern_item in enumerate(pattern_props):

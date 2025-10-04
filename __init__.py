@@ -27,6 +27,7 @@ from . import addon_updater_ops
 
 
 
+@addon_updater_ops.make_annotations
 class SetupAutoPreferences(bpy.types.AddonPreferences):
     bl_idname = __name__
 
@@ -104,12 +105,13 @@ def register():
     addon_updater_ops.make_annotations(SetupAutoPreferences)  # Avoid blender 2.8 warnings
     bpy.utils.register_class(SetupAutoPreferences)
     
+    addon_updater_ops.register(bl_info)
+
     quicksort.register()
     bgimage.register()
     Tools.register()
 
-    # Configure addon updater (after classes are registered)
-    addon_updater_ops.register(bl_info)
+
 
 def unregister():
     # Addon updater unregister (before classes are unregistered)

@@ -72,7 +72,7 @@ except Exception as e:
 # not match and have errors. Must be all lowercase and no spaces! Should also
 # be unique among any other addons that could exist (using this updater code),
 # to avoid clashes in operator registration.
-updater.addon = "setupauto"
+updater.addon = "addon_updater_demo"
 
 
 # -----------------------------------------------------------------------------
@@ -1353,16 +1353,16 @@ def register(bl_info):
     updater.private_token = None  # "tokenstring"
 
     # Choose your own username, must match website (not needed for GitLab).
-    updater.user = "GilHar20"
+    updater.user = "cgcookie"
 
     # Choose your own repository, must match git name for GitHUb and Bitbucket,
     # for GitLab use project ID (numbers only).
-    updater.repo = "SetupAuto"
+    updater.repo = "blender-addon-updater"
 
     # updater.addon = # define at top of module, MUST be done first
 
     # Website for manual addon download, optional but recommended to set.
-    updater.website = "https://github.com/GilHar20/SetupAuto/"
+    updater.website = "https://github.com/CGCookie/blender-addon-updater/"
 
     # Addon subfolder path.
     # "sample/path/to/addon"
@@ -1449,7 +1449,7 @@ def register(bl_info):
     # which enables pulling down release logs/notes, as well as installs update
     # from release-attached zips (instead of the auto-packaged code generated
     # with a release/tag). Setting has no impact on BitBucket or GitLab repos.
-    updater.use_releases = True
+    updater.use_releases = False
     # Note: Releases always have a tag, but a tag may not always be a release.
     # Therefore, setting True above will filter out any non-annotated tags.
     # Note 2: Using this option will also display (and filter by) the release
@@ -1460,7 +1460,7 @@ def register(bl_info):
     # Note: updater.include_branch_list defaults to ['master'] branch if set to
     # none. Example targeting another multiple branches allowed to pull from:
     # updater.include_branch_list = ['master', 'dev']
-    updater.include_branch_list = ['main']  # Use 'main' branch instead of default 'master'
+    updater.include_branch_list = None  # None is the equivalent = ['master']
 
     # Only allow manual install, thus prompting the user to open
     # the addon's web page to download, specifically: updater.website
@@ -1509,13 +1509,11 @@ def register(bl_info):
     # The register line items for all operators/panels.
     # If using bpy.utils.register_module(__name__) to register elsewhere
     # in the addon, delete these lines (also from unregister).
-    # Skip class registration if auto-registration is being used
-    if not hasattr(bpy.context, 'auto_registration_active'):
-        for cls in classes:
-            # Apply annotations to remove Blender 2.8+ warnings, no effect on 2.7
-            make_annotations(cls)
-            # Comment out this line if using bpy.utils.register_module(__name__)
-            bpy.utils.register_class(cls)
+    for cls in classes:
+        # Apply annotations to remove Blender 2.8+ warnings, no effect on 2.7
+        make_annotations(cls)
+        # Comment out this line if using bpy.utils.register_module(__name__)
+        bpy.utils.register_class(cls)
 
     # Special situation: we just updated the addon, show a popup to tell the
     # user it worked. Could enclosed in try/catch in case other issues arise.
@@ -1523,11 +1521,9 @@ def register(bl_info):
 
 
 def unregister():
-    # Skip class unregistration if auto-registration is being used
-    if not hasattr(bpy.context, 'auto_registration_active'):
-        for cls in reversed(classes):
-            # Comment out this line if using bpy.utils.unregister_module(__name__).
-            bpy.utils.unregister_class(cls)
+    for cls in reversed(classes):
+        # Comment out this line if using bpy.utils.unregister_module(__name__).
+        bpy.utils.unregister_class(cls)
 
     # Clear global vars since they may persist if not restarting blender.
     updater.clear_state()  # Clear internal vars, avoids reloading oddities.
