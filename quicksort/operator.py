@@ -7,34 +7,58 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
     bl_idname = "setupauto.ot_quicksort"
     bl_label = "Sort objects"
     bl_description = "Operator sorts all MESH objects in scene into collection based on string patterns"
+    bl_options = {'REGISTER', 'UNDO'}
 
-    def get_or_create_collection(self, context, pattern_item):
+
+    def get_collection(self, context, pattern_entry):
         """Get existing collection or create new one with proper parent"""
-        if pattern_item.pattern_name not in bpy.data.collections:
-            collection = bpy.data.collections.new(pattern_item.pattern_name)
-            
-            # Link to parent collection if specified, otherwise to scene collection
-            if pattern_item.parent_collection:
-                pattern_item.parent_collection.children.link(collection)
-            else:
-                context.scene.collection.children.link(collection)
-        else:
-            collection = bpy.data.collections[pattern_item.pattern_name]
-        
-        return collection
+        quicksort_props = context.scene.quicksort_props
 
-    def organize_objects(self, context, pattern_item, i):
+        if pattern_entry.pattern_name in bpy.data.collections:
+            pattern_collection = bpy.data.collections[pattern_entry.pattern_name]
+            return pattern_collection
+        else:
+            pattern_collection = bpy.data.collections.new(pattern_entry.pattern_sample)
+
+        main_collection = quicksort_props.main_collection
+        parent_collection = pattern_entry.parent_collection
+
+        match (bool(main_collection), bool(parent_collection)):
+            case (False, False):
+                context.scene.collection.children.link(pattern_collection)
+                self.report({'INFO'}, "case 1")
+            case (True, False):
+                main_collection.children.link(pattern_collection)
+                self.report({'INFO'}, "case 2")
+            case (False, True):
+                parent_collection.children.link(pattern_collection)
+                self.report({'INFO'}, "case 3")
+            case (True, True):
+                if parent_collection.name in main_collection.children:
+                    pass
+                else:    
+                    main_collection.children.link(parent_collection)
+                parent_collection.children.link(pattern_collection)
+                self.report({'INFO'}, "case 4")
+
+        return pattern_collection
+
+
+    def organize_objects(self, context, pattern_entry, i):
         """Organize objects into collections based on pattern"""
-        collection = self.get_or_create_collection(context, pattern_item)
-                                                      
+        collection = self.get_collection(context, pattern_entry)
+                       
         for obj in bpy.context.selected_objects:
             originalCollection = obj.users_collection[0]
             originalCollection.objects.unlink(obj)
             collection.objects.link(obj)
-        
-        print(f"Iteration {i+1}: Objects organized into collection: {pattern_item.pattern_name}")
 
-    def join_objects(self, context, pattern_item, i):
+        #context.layer_collection.children[collection.name].exclude = True
+        
+        print(f"Iteration {i+1}: Objects organized into collection: {pattern_entry.pattern_name}")
+
+
+    def join_objects(self, context, pattern_entry, i):
         """Join objects together and organize into collection"""
         selected_objects = list(bpy.context.selected_objects)
         
@@ -42,70 +66,62 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
             print(f"Iteration {i+1}: Less than 2 objects selected, nothing to join")
             return
             
-        # Create or get collection
-        collection = self.get_or_create_collection(context, pattern_item)
+        collection = self.get_collection(context, pattern_entry)
         
-        # Set first object as active
         bpy.context.view_layer.objects.active = selected_objects[0]
         
-        # Join objects
         bpy.ops.object.join()
         
-        # Move joined object to collection
         joined_object = bpy.context.active_object
         if joined_object:
             originalCollection = joined_object.users_collection[0]
             originalCollection.objects.unlink(joined_object)
             collection.objects.link(joined_object)
         
-        print(f"Iteration {i+1}: {len(selected_objects)} objects joined and organized into collection: {pattern_item.pattern_name}")
+        print(f"Iteration {i+1}: {len(selected_objects)} objects joined and organized into collection: {pattern_entry.pattern_name}")
 
-    def delete_objects(self, context, pattern_item, i):
+
+    def delete_objects(self, context, pattern_entry, i):
         """Delete selected objects"""
         selected_objects = list(bpy.context.selected_objects)
         for obj in selected_objects:
             bpy.data.objects.remove(obj, do_unlink=True)
         
-        print(f"Iteration {i+1}: {len(selected_objects)} objects deleted using pattern: {pattern_item.pattern_sample}")
+        print(f"Iteration {i+1}: {len(selected_objects)} objects deleted using pattern: {pattern_entry.pattern_sample}")
+
 
     def execute(self, context):
         pattern_props = context.scene.pattern_props
         
         if not pattern_props:
-            print("No pattern properties defined")
+            self.report({'INFO'}, "No pattern properties defined, cancelled.")
             return {'CANCELLED'}
 
-        # Track used pattern samples to avoid duplicates
         used_pattern_samples = set()
 
         # Run the pattern operation for each item in the collection
-        for i, pattern_item in enumerate(pattern_props):
-            # Check if pattern name and sample are available for this iteration
-            if not pattern_item.pattern_name or not pattern_item.pattern_sample:
-                print(f"Iteration {i+1}: Skipped - missing pattern name or pattern sample")
+        for i, pattern_entry in enumerate(pattern_props):
+            if not pattern_entry.pattern_sample:
+                print(f"Iteration {i+1}: Skipped, missing pattern sample.")
                 continue
 
-            # Check if this pattern sample was already used
-            if pattern_item.pattern_sample in used_pattern_samples:
-                print(f"Iteration {i+1}: Skipped - pattern sample '{pattern_item.pattern_sample}' was already used in a previous iteration")
+            if pattern_entry.pattern_sample in used_pattern_samples:
+                print(f"Iteration {i+1}: Skipped - pattern sample '{pattern_entry.pattern_sample}' was already used.")
                 continue
 
-            # Add this pattern sample to used set
-            used_pattern_samples.add(pattern_item.pattern_sample)
+            used_pattern_samples.add(pattern_entry.pattern_sample)
 
             bpy.ops.object.select_all(action='DESELECT')
-            bpy.ops.object.select_pattern(pattern="*" + pattern_item.pattern_sample + "*")
+            bpy.ops.object.select_pattern(pattern="*" + pattern_entry.pattern_sample + "*")
 
             # Handle different actions using match statement
-            match pattern_item.pattern_action:
+            match pattern_entry.pattern_action:
                 case 'ORGANIZE':
-                    self.organize_objects(context, pattern_item, i)
+                    self.organize_objects(context, pattern_entry, i)
                 case 'JOIN':
-                    self.join_objects(context, pattern_item, i)
+                    self.join_objects(context, pattern_entry, i)
                 case 'DELETE':
-                    self.delete_objects(context, pattern_item, i)
-                case _:
-                    print(f"Iteration {i+1}: Unknown action '{pattern_item.pattern_action}'")
+                    self.delete_objects(context, pattern_entry, i)
             
             bpy.ops.object.select_all(action='DESELECT')
         
