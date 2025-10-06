@@ -1,6 +1,6 @@
 bl_info = {
     "name": "SetupAuto",
-    "version": (1, 4, 0),
+    "version": (1, 5, 1),
     "blender": (4, 5, 0),
     "author": "Gilad Harnik",
     "location": "View3D > Tool Shelf",

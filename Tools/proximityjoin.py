@@ -8,6 +8,7 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
     bl_idname = "setupauto.ot_proxjoin"
     bl_label = "proximity join"
     bl_description = "Operator loops through objects in the scene, joining objects together if are closer than specified proximity."
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         tools_props = context.scene.tools_props

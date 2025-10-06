@@ -7,6 +7,7 @@ class SETUPAUTO_OT_singleuser(bpy.types.Operator):
     bl_idname = "setupauto.ot_singleuser"
     bl_label = "make single user"
     bl_description = "Operator makes each selected object have a single user data"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         for obj in bpy.context.selected_objects:

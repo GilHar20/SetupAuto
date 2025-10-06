@@ -12,46 +12,56 @@ class SETUPAUTO_OT_patternsdetection(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
 
-    def string_reformat(self, context, ):
-        pass
-
 
     # pattern detection does the main work in itself.
     # apply_patterns_to_ui is the function that applies the patterns to the UI.
     def pattern_detection(self, object_names):
         """pattern detection algorithm"""
 
-        # Save a copy of original strings
         patterns = set()
         
-        # Clean strings       side_0102
         for original in object_names:
             string_reformatted = ""
             string_start = False
+            words = 0
 
             for i, char in enumerate(original):
                 if re.search(r'[0-9\s\-_,\.\(\)\[\]\{\}<>|/\\:;!@#$%^&*+=`~"\'?]', char) and string_start == False:
                     continue
                 else:
+                    if re.search(r'[\s\-_]', char):
+                        words += 1
                     string_start = True
                     string_reformatted = string_reformatted + char
 
-                next_char = bool(re.search(r'[0-9\s\-_,\.\(\)\[\]\{\}<>|/\\:;!@#$%^&*+=`~"\'?]', original[i+1]))
-                second_next_char = bool(re.search(r'[0-9\s\-_,\.\(\)\[\]\{\}<>|/\\:;!@#$%^&*+=`~"\'?]', original[i+2]))
-                third_next_char = bool(re.search(r'[0-9\s\-_,\.\(\)\[\]\{\}<>|/\\:;!@#$%^&*+=`~"\'?]', original[i+3]))
+                if i + 1 <= len(original)-1:
+                    next_char = bool(re.search(r'[0-9\s\-_,\.\(\)\[\]\{\}<>|/\\:;!@#$%^&*+=`~"\'?]', original[i+1]))
+                else:
+                    next_char = False
+
+                if i + 2 <= len(original)-1:
+                    second_next_char = bool(re.search(r'[0-9\s\-_,\.\(\)\[\]\{\}<>|/\\:;!@#$%^&*+=`~"\'?]', original[i+2]))
+                else:
+                    second_next_char = False
+
+                if i + 3 <= len(original)-1:
+                    third_next_char = bool(re.search(r'[0-9\s\-_,\.\(\)\[\]\{\}<>|/\\:;!@#$%^&*+=`~"\'?]', original[i+3]))
+                else:
+                    third_next_char = False
+
+                if words >= 4:
+                    string_start = False
+                    break
 
                 if next_char and second_next_char and third_next_char:
                     string_start = False
                     break
 
-                #if string_end > 3:
-                #    string_start = False
-                #    string_end = 0
-
             #original = re.sub(r'[0-9,\.\(\)\[\]\{\}<>|/\\:;!@#$%^&*+=`~"\'?]', '', original)
             patterns.add(string_reformatted)
         
         return patterns
+
 
     def apply_patterns_to_ui(self, context, patterns):
         """Apply detected patterns to UI pattern properties"""
@@ -59,7 +69,6 @@ class SETUPAUTO_OT_patternsdetection(bpy.types.Operator):
 
         pattern_props.clear()
     
-        # Create pattern entries
         pattern_index = 0
         for entry in patterns:
             
