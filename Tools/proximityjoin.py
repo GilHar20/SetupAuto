@@ -13,6 +13,10 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
     def execute(self, context):
         tools_props = context.scene.tools_props
         
+        if not context.selected_objects:
+            self.report({'INFO'}, "No objects were selected. Please select objects.")
+            return {'CANCELLED'}
+
         selected = [obj for obj in context.selected_objects if obj.type == 'MESH']
         remaining = set(selected)  # Keep track of unclustered objects
         clusters = []
@@ -61,6 +65,6 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
             bpy.context.view_layer.objects.active = cluster[0]
             bpy.ops.object.join()
 
-        print(f"Joined {len([c for c in clusters if len(c) > 1])} clusters.")
+        self.reopr({'INFO'}, f"Joined {len([c for c in clusters if len(c) > 1])} clusters.")
 
         return {'FINISHED'}

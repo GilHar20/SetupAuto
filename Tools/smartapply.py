@@ -22,6 +22,10 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
         else:
             pass
 
+        if not context.selected_objects:
+            self.report({'INFO'}, "No objects were selected. Please select objects.")
+            return {'CANCELLED'}
+
         selected = context.selected_objects
         remaining = set(selected)
 

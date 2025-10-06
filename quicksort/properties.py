@@ -5,7 +5,7 @@ import bpy
 class SETUPAUTO_PG_quicksort_props (bpy.types.PropertyGroup):
     main_collection : bpy.props.PointerProperty(
         name = "Main Collection",
-        description = "Main collection to cotain all created collections. Leave empty to link to scene collection",
+        description = "Main collection to cotain all new created collections. Leave empty to link to scene collection.",
         type = bpy.types.Collection
     )
 
@@ -14,29 +14,31 @@ class SETUPAUTO_PG_quicksort_props (bpy.types.PropertyGroup):
 class SETUPAUTO_PG_pattern_props (bpy.types.PropertyGroup):
     pattern_name : bpy.props.StringProperty(
         name = "Pattern name",
+        description = "Name of the collection where objects selected by this pattern will be stored.",
         default = ""
     )
 
     pattern_sample : bpy.props.StringProperty(
         name = "Pattern sample",
+        description = "The string used to select by pattern.",
         default = ""
+    )
+
+    parent_collection : bpy.props.PointerProperty(
+        name = "Parent Collection",
+        description = "A collection to store the new collection (named by pattern sample). Leave empty to link to scene collection.",
+        type = bpy.types.Collection
     )
 
     pattern_action : bpy.props.EnumProperty(
         name = "Pattern Method",
-        description = "Operation to perform on objects selected by the pattern",
+        description = "Operation to perform on objects selected by the pattern.",
         items = [
         ('ORGANIZE', "Organize", "Organize objects"),
         ('JOIN', "Join", "Join objects"),
         ('DELETE', "Delete", "Delete objects"),
         ],
         default = 'ORGANIZE'
-    )
-
-    parent_collection : bpy.props.PointerProperty(
-        name = "Parent Collection",
-        description = "Parent collection to link the new collection under. Leave empty to link to scene collection",
-        type = bpy.types.Collection
     )
 
 

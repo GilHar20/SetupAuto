@@ -14,4 +14,6 @@ class SETUPAUTO_OT_purgeunused(bpy.types.Operator):
 
         bpy.ops.outliner.orphans_purge(do_local_ids = tools_props.do_local, do_linked_ids = tools_props.do_linked, do_recursive = tools_props.do_recursive)
         
+        self.report({'INFO'}, "Data purged!")
+
         return {'FINISHED'}

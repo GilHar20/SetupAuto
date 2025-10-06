@@ -80,9 +80,6 @@ class SETUPAUTO_OT_patternsdetection(bpy.types.Operator):
             pattern_index += 1
 
 
-    def sort_criteria(self, context, string):
-        return len(string)
-
 
     def execute(self, context):
         """Operator finds patterns in objects names as strings"""
@@ -106,7 +103,6 @@ class SETUPAUTO_OT_patternsdetection(bpy.types.Operator):
             self.report({'INFO'}, f"Found {len(patterns)} prefix patterns")
 
         patterns.sort(key = lambda x: len(x))
-        print(patterns)
 
         try:
             self.apply_patterns_to_ui(context, patterns)
