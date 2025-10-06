@@ -43,20 +43,19 @@ class SETUPAUTO_PT_quicksort_panel(bpy.types.Panel):
 
         # Draw pattern properties for each item in the collection - each in its own box    
         for i, pattern_item in enumerate(pattern_props):
-            # Create individual box for each pattern item
             patternBox = boxSort.box()
-            patternBox.label(text=f"Pattern #{i+1}")
+            rowTop = patternBox.row(align = True)
+            rowTop.label(text=f"Pattern #{i+1}:", icon = 'SORTSIZE')
+            rowTop.operator('object.select_pattern', text = "Check Pattern", icon = 'VIEW_ZOOM').pattern = "*" + str(pattern_item.pattern_sample) + "*"
+            rowTop.operator('setupauto.remove_pattern', text = "Remove", icon = 'REMOVE').pattern_index = i
             
-            # Action and parent collection properties on the same row
             rowAction = patternBox.row()
             rowAction.prop(pattern_item, "pattern_action", text="Action")
             rowAction.prop(pattern_item, "parent_collection", text="Parent")
             
-            # Name and sample properties on the second row
             rowPattern = patternBox.row()
             rowPattern.prop(pattern_item, "pattern_name", text="Name")
             rowPattern.prop(pattern_item, "pattern_sample", text="Sample")
 
-        # Draw sort button
         rowSort2 = boxSort.row()
         rowSort2.operator('setupauto.ot_quicksort', text = "Quick Sort!")

@@ -8,7 +8,7 @@ class SETUPAUTO_OT_dups2inst(bpy.types.Operator):
     bl_idname = "setupauto.ot_dups2inst"
     bl_label = "duplicates to instances"
     bl_description = "Operator loops through selected objects, linking objects data together if the topology is close enough."
-
+    bl_options = {'REGISTER', 'UNDO'}
 
     def mesh_hash(self, obj):
         mesh = obj.data

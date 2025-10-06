@@ -122,7 +122,7 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
                     self.join_objects(context, pattern_entry, i)
                 case 'DELETE':
                     self.delete_objects(context, pattern_entry, i)
-            
+
             bpy.ops.object.select_all(action='DESELECT')
         
         return {'FINISHED'}

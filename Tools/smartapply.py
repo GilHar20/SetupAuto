@@ -7,12 +7,27 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
     bl_idname = "setupauto.ot_smartapply"
     bl_label = "smart apply"
     bl_description = "Operator loops through selected objects, apllies selected transform data, including batches of linked data"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         tools_props = context.scene.tools_props
 
+        for area in bpy.context.screen.areas:
+            if area.type == 'VIEW_3D':
+                view_3d = area.spaces.active
+
+        if view_3d.local_view:
+            self.report({'ERROR'}, "You must leave local view for this operator to work! Press ? to leave local view")
+            return {"CANCELLED"}
+        else:
+            pass
+
+        if not context.selected_objects:
+            self.report({'INFO'}, "No objects were selected. Please select objects.")
+            return {'CANCELLED'}
+
         selected = context.selected_objects
-        remaining = set(selected)  # Keep track of unclustered objects
+        remaining = set(selected)
 
         bpy.ops.object.select_all(action='DESELECT')
 
@@ -20,30 +35,24 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
             # Get the next object from the set
             obj = next(iter(remaining))
             
-            # Check if this object has linked data
             if obj.data and obj.data.users > 1:
-                # Find all objects with the same linked data
-                linked_cluster = [linked for linked in remaining if linked.data == obj.data]
-                
-                # Select all linked objects
-                for linked_obj in linked_cluster:
-                    linked_obj.select_set(True)
+                bpy.context.view_layer.objects.active = obj
+                bpy.ops.object.select_linked(extend = False, type = 'OBDATA')
 
-                bpy.context.view_layer.objects.active = linked_cluster[0]
-                
-                # Apply transforms to all linked objects at once
                 bpy.ops.object.transform_apply(location=tools_props.location, rotation=tools_props.rotation, scale=tools_props.scale)
                 
-                # Remove all linked objects from the remaining set
-                for linked_obj in linked_cluster:
-                    remaining.remove(linked_obj)
-            else:
-                # Single object, no linked data
+                for linked_obj in context.selected_objects:
+                    if linked_obj in remaining:
+                        remaining.remove(linked_obj)
+                bpy.ops.object.select_all(action='DESELECT')
+
+            elif obj.data:
+                obj.select_set(True)
                 bpy.context.view_layer.objects.active = obj
                 bpy.ops.object.transform_apply(location=tools_props.location, rotation=tools_props.rotation, scale=tools_props.scale)
                 remaining.remove(obj)
-            
-            # Deselect all for next iteration
+                bpy.ops.object.select_all(action='DESELECT')
+
             bpy.ops.object.select_all(action='DESELECT')
 
         for obj in selected:
