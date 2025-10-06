@@ -47,7 +47,7 @@ class SETUPAUTO_PT_quicksort_panel(bpy.types.Panel):
             rowTop = patternBox.row(align = True)
             rowTop.label(text=f"Pattern #{i+1}:", icon = 'SORTSIZE')
             rowTop.operator('object.select_pattern', text = "Check Pattern", icon = 'VIEW_ZOOM').pattern = "*" + str(pattern_item.pattern_sample) + "*"
-            rowTop.operator('setupauto.remove_pattern', text = "Remove", icon = 'REMOVE')
+            rowTop.operator('setupauto.remove_pattern', text = "Remove", icon = 'REMOVE').pattern_index = i
             
             rowAction = patternBox.row()
             rowAction.prop(pattern_item, "pattern_action", text="Action")
