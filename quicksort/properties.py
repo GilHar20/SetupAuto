@@ -57,9 +57,33 @@ class SETUPAUTO_OT_remove_pattern(bpy.types.Operator):
     bl_label = "Remove Pattern"
     bl_description = "Remove the last pattern from the collection"
 
-    def execute(self, context):
-        if len(context.scene.pattern_props) > 0:
+    '''
+        if len(context.scene.pattern_props) == 0:
+            self.report({'INFO'}, "Pattern list is empty.")
+            
+        if not pattern_item:
             context.scene.pattern_props.remove(len(context.scene.pattern_props) - 1)
+        
+        else:
+            context.scene.pattern_props.remove(pattern_item)
+        
+        return {'FINISHED'}
+    '''
+
+    pattern_index = 0
+    #pattern_index = bpy.props.IntProperty(name = "pattern index", default = 0)
+
+    def execute(self, context):
+        if len(context.scene.pattern_props) == 0:
+            self.report({'INFO'}, "Pattern list is empty.")
+            
+        if self.pattern_index == 0:
+            context.scene.pattern_props.remove(len(context.scene.pattern_props) - 1)
+        
+        else:
+            context.scene.pattern_props.remove(self.pattern_index)
+            self.pattern_index = 0
+        
         return {'FINISHED'}
 
 

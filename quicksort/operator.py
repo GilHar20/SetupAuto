@@ -56,7 +56,6 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
         #context.layer_collection.children[collection.name].exclude = True
         
         print(f"Iteration {i+1}: Objects organized into collection: {pattern_entry.pattern_name}")
-        self.report({'INFO'}, f"Iteration {i+1}: Objects organized into collection: {pattern_entry.pattern_name}")
 
 
     def join_objects(self, context, pattern_entry, i):
