@@ -65,6 +65,6 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
             bpy.context.view_layer.objects.active = cluster[0]
             bpy.ops.object.join()
 
-        self.reopr({'INFO'}, f"Joined {len([c for c in clusters if len(c) > 1])} clusters.")
+        self.report({'INFO'}, f"Joined {len([c for c in clusters if len(c) > 1])} clusters.")
 
         return {'FINISHED'}

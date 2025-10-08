@@ -38,4 +38,5 @@ class SETUPAUTO_OT_dups2inst(bpy.types.Operator):
             self.replace_with_instances()
         else:
             self.report({'INFO'}, "No objects selected.")
+            return {'CANCELLED'}
         return {'FINISHED'}
