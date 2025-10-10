@@ -14,11 +14,13 @@ class SETUPAUTO_OT_singleuser(bpy.types.Operator):
             self.report({'INFO'}, "No objects were selected. Please select objects.")
             return {'CANCELLED'}
         
-        for obj in bpy.context.selected_objects:
+        selected = context.selected_objects
+
+        for obj in selected:
             # Make the object data (like mesh, curve, etc.) single user
             if obj.data and obj.data.users > 1:
                 obj.data = obj.data.copy()
 
-        self.report({'INFO'}, "Selected objects are now single users!")
+        self.report({'INFO'}, "All " + str(len(selected)) + " selected objects are now single users!")
 
         return {'FINISHED'}

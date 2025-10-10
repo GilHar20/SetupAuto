@@ -9,29 +9,29 @@ class SETUPAUTO_PG_quicksort_props (bpy.types.PropertyGroup):
         type = bpy.types.Collection
     )
 
-
-
 class SETUPAUTO_PG_pattern_props (bpy.types.PropertyGroup):
-    pattern_name : bpy.props.StringProperty(
-        name = "Pattern name",
-        description = "Name of the collection where objects selected by this pattern will be stored.",
+    pattern_sample : bpy.props.StringProperty(
+        name = "Pattern Sample",
+        description = "The string pattern used to select objects.",
         default = ""
     )
 
-    pattern_sample : bpy.props.StringProperty(
-        name = "Pattern sample",
-        description = "The string used to select by pattern.",
+    output_collection : bpy.props.StringProperty(
+        name = "Output Collection",
+        description = "Collection to contain all objects selected by this pattern will be stored with this name." \
+        "If empty, the collection will be named the same as the pattern sample.",
         default = ""
     )
 
     parent_collection : bpy.props.PointerProperty(
         name = "Parent Collection",
-        description = "A collection to store the new collection (named by pattern sample). Leave empty to link to scene collection.",
+        description = "Collection to contain the new Output Collection. Leave empty to link Output Collection to Main Collection." \
+        "If Main Collection also empty, Output Collection will link to scene collection.",
         type = bpy.types.Collection
     )
 
     pattern_action : bpy.props.EnumProperty(
-        name = "Pattern Method",
+        name = "Pattern Action",
         description = "Operation to perform on objects selected by the pattern.",
         items = [
         ('ORGANIZE', "Organize", "Organize objects"),
