@@ -14,8 +14,8 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
         """Get existing collection or create new one with proper parent"""
         quicksort_props = context.scene.quicksort_props
 
-        if pattern_entry.pattern_name in bpy.data.collections:
-            pattern_collection = bpy.data.collections[pattern_entry.pattern_name]
+        if pattern_entry.output_collection in bpy.data.collections:
+            pattern_collection = bpy.data.collections[pattern_entry.output_collection]
             return pattern_collection
         else:
             pattern_collection = bpy.data.collections.new(pattern_entry.pattern_sample)
@@ -55,7 +55,7 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
 
         #context.layer_collection.children[collection.name].exclude = True
         
-        print(f"Iteration {i+1}: Objects organized into collection: {pattern_entry.pattern_name}")
+        print(f"Iteration {i+1}: Objects organized into collection: {pattern_entry.output_collection}")
 
 
     def join_objects(self, context, pattern_entry, i):
@@ -78,7 +78,7 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
             originalCollection.objects.unlink(joined_object)
             collection.objects.link(joined_object)
         
-        print(f"Iteration {i+1}: {len(selected_objects)} objects joined and organized into collection: {pattern_entry.pattern_name}")
+        print(f"Iteration {i+1}: {len(selected_objects)} objects joined and organized into collection: {pattern_entry.output_collection}")
 
 
     def delete_objects(self, context, pattern_entry, i):
@@ -114,7 +114,6 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
             bpy.ops.object.select_all(action='DESELECT')
             bpy.ops.object.select_pattern(pattern="*" + pattern_entry.pattern_sample + "*")
 
-            # Handle different actions using match statement
             match pattern_entry.pattern_action:
                 case 'ORGANIZE':
                     self.organize_objects(context, pattern_entry, i)
