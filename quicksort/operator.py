@@ -52,8 +52,21 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
             originalCollection = obj.users_collection[0]
             originalCollection.objects.unlink(obj)
             collection.objects.link(obj)
+        
+        print(f"Iteration {i+1}: Objects organized into collection: {pattern_entry.output_collection}")
 
-        #context.layer_collection.children[collection.name].exclude = True
+
+    def rename_objects(self, context, pattern_entry, i):
+        """Organize objects into collections based on pattern"""
+        collection = self.get_collection(context, pattern_entry)
+                       
+        for obj in bpy.context.selected_objects:
+            # Added line for renaming
+            obj.name = f"{pattern_entry.new_name}.{i+1:03d}"
+
+            originalCollection = obj.users_collection[0]
+            originalCollection.objects.unlink(obj)
+            collection.objects.link(obj)
         
         print(f"Iteration {i+1}: Objects organized into collection: {pattern_entry.output_collection}")
 
@@ -117,6 +130,8 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
             match pattern_entry.pattern_action:
                 case 'ORGANIZE':
                     self.organize_objects(context, pattern_entry, i)
+                case 'RENAME':
+                    self.rename_objects(context, pattern_entry, i)
                 case 'JOIN':
                     self.join_objects(context, pattern_entry, i)
                 case 'DELETE':

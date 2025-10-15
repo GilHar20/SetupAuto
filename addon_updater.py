@@ -68,7 +68,7 @@ class SingletonUpdater:
         self._latest_release = None
         self._use_releases = False
         self._include_branches = False
-        self._include_branch_list = ['master']
+        self._include_branch_list = ['main']
         self._include_branch_auto_check = False
         self._manual_only = False
         self._version_min_update = None
