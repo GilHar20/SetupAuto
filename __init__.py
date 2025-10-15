@@ -82,9 +82,6 @@ class SetupAutoPreferences(bpy.types.AddonPreferences):
         row = box.row()
         row.label(text=f"Branch: {bl_info['git_branch']}")
         
-        # Addon updater UI - this provides the update functionality
-        addon_updater_ops.update_settings_ui(self, context)
-        
         # Documentation links
         box = layout.box()
         box.label(text="Documentation & Support", icon='HELP')
@@ -94,6 +91,10 @@ class SetupAutoPreferences(bpy.types.AddonPreferences):
         
         row = box.row()
         row.operator("wm.url_open", text="Report Issues", icon='URL').url = bl_info['tracker_url']
+
+        # Addon updater UI - this provides the update functionality
+        addon_updater_ops.update_settings_ui(self, context)
+        addon_updater_ops.update_notice_box_ui(self, context)
 
 
 #==============================================

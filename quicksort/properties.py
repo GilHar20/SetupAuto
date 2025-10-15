@@ -35,10 +35,17 @@ class SETUPAUTO_PG_pattern_props (bpy.types.PropertyGroup):
         description = "Operation to perform on objects selected by the pattern.",
         items = [
         ('ORGANIZE', "Organize", "Organize objects"),
+        ('RENAME', "Rename", "Rename objects"),
         ('JOIN', "Join", "Join objects"),
         ('DELETE', "Delete", "Delete objects"),
         ],
         default = 'ORGANIZE'
+    )
+
+    new_name : bpy.props.StringProperty(
+        name="New Name",
+        description="New name to give all new linked objects. NOTE! Will name ALL selected objects!",
+        default=""
     )
 
 
