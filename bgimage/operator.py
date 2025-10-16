@@ -16,7 +16,7 @@ class SETUPAUTO_OT_bgimage(bpy.types.Operator):
         bg_props = context.scene.bgimage_props
         
         base_name, _ = os.path.splitext(camera.name)
-        background_image_path = os.path.join(background_folder_path, base_name + bg_props.image_fornmat)
+        background_image_path = os.path.join(background_folder_path, base_name + bg_props.image_format)
 
         background_image = None
 
@@ -30,7 +30,7 @@ class SETUPAUTO_OT_bgimage(bpy.types.Operator):
             return background_image
 
 
-    def sequentil_match(slef, context, camera, background_folder_path):
+    def sequential_match(self, context, camera, background_folder_path):
         bg_props = context.scene.bgimage_props
         
         background_image = None
@@ -44,7 +44,7 @@ class SETUPAUTO_OT_bgimage(bpy.types.Operator):
             print(f"Trying sequential number match: {sequential_number}")
             
             for filename in os.listdir(background_folder_path):
-                if sequential_number in filename and filename.endswith(bg_props.image_fornmat):
+                if sequential_number in filename and filename.endswith(bg_props.image_format):
                     background_image_path = os.path.join(background_folder_path, filename)
                     background_image = bpy.data.images.load(background_image_path)
                     print(f"Sequential match found for {camera.name}: {background_image_path}")
@@ -71,11 +71,11 @@ class SETUPAUTO_OT_bgimage(bpy.types.Operator):
 
         for camera in cameras:
             
-            background_image = self.exact_match(camera, background_folder_path)
+            background_image = self.exact_match(context, camera, background_folder_path)
 
             if background_image == None:
                 # try sequentail
-                background_image = self.sequentil_match(camera, background_folder_path)
+                background_image = self.sequential_match(context, camera, background_folder_path)
 
             if background_image is None:
                 print(f"Could not load any image for {camera.name}")
