@@ -69,15 +69,15 @@ class SETUPAUTO_OT_patternsdetection(bpy.types.Operator):
 
         pattern_props.clear()
     
-        #pattern_index = 0
-        for i, entry in patterns:
+        pattern_index = 0
+        for entry in patterns:
             
             bpy.ops.setupauto.add_pattern()
-            current_pattern = pattern_props[i]
-            current_pattern.output_collection = entry
-            current_pattern.pattern_sample = entry
+            pattern_entry = pattern_props[pattern_index]
+            pattern_entry.output_collection = entry
+            pattern_entry.pattern_sample = entry
 
-            #pattern_index += 1
+            pattern_index += 1
 
 
 
@@ -109,5 +109,5 @@ class SETUPAUTO_OT_patternsdetection(bpy.types.Operator):
         except:
             self.report({'ERROR'}, "Failed to apply patterns to UI")
             return {'CANCELLED'}
-        
+
         return {'FINISHED'}
