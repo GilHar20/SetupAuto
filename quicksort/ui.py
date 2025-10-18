@@ -49,16 +49,16 @@ class SETUPAUTO_PT_quicksort_panel(bpy.types.Panel):
             patternBox = boxSort.box()
             rowTop = patternBox.row(align=True)
             rowTop.label(text=f"Pattern Entry #{i+1}:", icon = 'SORTSIZE')
-            rowTop.operator('object.select_pattern', text = "", icon = 'VIEW_ZOOM').pattern = "*" + str(pattern_entry.pattern_sample) + "*"
+            rowTop.operator('setupauto.select_pattern', text = "", icon = 'VIEW_ZOOM').select_pattern = str(pattern_entry.pattern_sample)
             rowTop.operator('setupauto.remove_pattern', text = "", icon = 'REMOVE').pattern_index = i
-            
-            rowCollection = patternBox.row(align=True)
-            rowCollection.prop(pattern_entry, "parent_collection", text="", placeholder="Parent Collection")
-            rowCollection.prop(pattern_entry, "output_collection", text="", placeholder="Output Collection", icon = 'OUTLINER_COLLECTION')
 
             rowAction = patternBox.row(align=True)
             rowAction.prop(pattern_entry, "pattern_action", text="")
             rowAction.prop(pattern_entry, "pattern_sample", text="", placeholder="Sample")
+
+            rowCollection = patternBox.row(align=True)
+            rowCollection.prop(pattern_entry, "parent_collection", text="", placeholder="Parent Collection")
+            rowCollection.prop(pattern_entry, "output_collection", text="", placeholder="Output Collection", icon = 'OUTLINER_COLLECTION')
 
             match pattern_entry.pattern_action:
                 case 'RENAME':

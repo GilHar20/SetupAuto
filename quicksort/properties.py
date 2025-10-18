@@ -18,14 +18,14 @@ class SETUPAUTO_PG_pattern_props (bpy.types.PropertyGroup):
 
     output_collection : bpy.props.StringProperty(
         name = "Output Collection",
-        description = "Collection to contain all objects selected by this pattern will be stored with this name." \
+        description = "Collection to contain all objects selected by this pattern will be stored with this name. " \
         "If empty, the collection will be named the same as the pattern sample.",
         default = ""
     )
 
     parent_collection : bpy.props.PointerProperty(
         name = "Parent Collection",
-        description = "Collection to contain the new Output Collection. Leave empty to link Output Collection to Main Collection." \
+        description = "Collection to contain the new Output Collection. Leave empty to link Output Collection to Main Collection. " \
         "If Main Collection also empty, Output Collection will link to scene collection.",
         type = bpy.types.Collection
     )
@@ -34,10 +34,10 @@ class SETUPAUTO_PG_pattern_props (bpy.types.PropertyGroup):
         name = "Pattern Action",
         description = "Operation to perform on objects selected by the pattern.",
         items = [
-        ('ORGANIZE', "Organize", "Organize objects"),
-        ('RENAME', "Rename", "Rename objects"),
-        ('JOIN', "Join", "Join objects"),
-        ('DELETE', "Delete", "Delete objects"),
+        ('ORGANIZE', "Organize", "Organize objects", 'UV_SYNC_SELECT', 0),
+        ('RENAME', "Rename", "Rename objects", 'FONT_DATA', 1),
+        ('JOIN', "Join", "Join objects", 'OVERLAY', 2),
+        ('DELETE', "Delete", "Delete objects", 'TRASH', 3),
         ],
         default = 'ORGANIZE'
     )
@@ -69,7 +69,8 @@ class SETUPAUTO_OT_remove_pattern(bpy.types.Operator):
     bl_description = "Remove the last pattern from the collection"
 
     pattern_index : bpy.props.IntProperty(
-        name = "pattern index",
+        name = "Pattern Index",
+        description= "Index of the pattern to dele. -1 (default) will be last pattern entry.",
         default = -1
     )
 
@@ -78,7 +79,7 @@ class SETUPAUTO_OT_remove_pattern(bpy.types.Operator):
 
         if len(pattern_props) == 0:
             self.report({'INFO'}, "Pattern list is empty.")
-            
+        
         if self.pattern_index == -1:
             pattern_props.remove(len(pattern_props) - 1)
         
@@ -99,4 +100,26 @@ class SETUPAUTO_OT_clear_patterns(bpy.types.Operator):
     def execute(self, context):
         if len(context.scene.pattern_props) > 0:
             bpy.context.scene.pattern_props.clear()
+        return {'FINISHED'}
+
+
+
+class SETUPAUTO_OT_select_pattern(bpy.types.Operator):
+    '''Select all objects corresponding to the patern'''
+    bl_idname = "setupauto.select_pattern"
+    bl_label = "Select Patterns"
+    bl_description = "Select all objects corresponding to the patern"
+
+    select_pattern : bpy.props.StringProperty(
+        name = "Select Pattern",
+        description = "Pattern to select all corresponding objects.",
+        default = ""
+    )
+
+    def execute(self, context):
+        bpy.ops.object.select_pattern(pattern = "*" + self.select_pattern + "*", case_sensitive = False, extend = False)
+        
+        bpy.context.view_layer.objects.active = context.selected_objects[0]
+
+        self.report({'INFO'}, "Selected " + str(len(context.selected_objects)) + " objects!")
         return {'FINISHED'}
