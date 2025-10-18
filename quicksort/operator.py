@@ -14,11 +14,15 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
         """Get existing collection or create new one with proper parent"""
         quicksort_props = context.scene.quicksort_props
 
-        if pattern_entry.output_collection in bpy.data.collections:
+        if not pattern_entry.output_collection:
+            pattern_collection = bpy.data.collections.new(pattern_entry.pattern_sample)
+
+        elif pattern_entry.output_collection in bpy.data.collections:
             pattern_collection = bpy.data.collections[pattern_entry.output_collection]
             return pattern_collection
+        
         else:
-            pattern_collection = bpy.data.collections.new(pattern_entry.pattern_sample)
+            pattern_collection = pattern_collection = bpy.data.collections.new(pattern_entry.output_collection)
 
         main_collection = quicksort_props.main_collection
         parent_collection = pattern_entry.parent_collection
@@ -26,41 +30,43 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
         match (bool(main_collection), bool(parent_collection)):
             case (False, False):
                 context.scene.collection.children.link(pattern_collection)
-                self.report({'INFO'}, "case 1")
+                #self.report({'INFO'}, "case 1")
             case (True, False):
                 main_collection.children.link(pattern_collection)
-                self.report({'INFO'}, "case 2")
+                #self.report({'INFO'}, "case 2")
             case (False, True):
                 parent_collection.children.link(pattern_collection)
-                self.report({'INFO'}, "case 3")
+                #self.report({'INFO'}, "case 3")
             case (True, True):
                 if parent_collection.name in main_collection.children:
                     pass
                 else:    
                     main_collection.children.link(parent_collection)
                 parent_collection.children.link(pattern_collection)
-                self.report({'INFO'}, "case 4")
+                #self.report({'INFO'}, "case 4")
 
         return pattern_collection
 
 
     def organize_objects(self, context, pattern_entry, i):
         """Organize objects into collections based on pattern"""
+        selected_objects = list(bpy.context.selected_objects)
         collection = self.get_collection(context, pattern_entry)
                        
-        for obj in bpy.context.selected_objects:
+        for obj in selected_objects:
             originalCollection = obj.users_collection[0]
             originalCollection.objects.unlink(obj)
             collection.objects.link(obj)
         
-        print(f"Iteration {i+1}: Objects organized into collection: {pattern_entry.output_collection}")
+        print(f"Iteration {i+1}: {len(selected_objects)} objects organized into collection: {pattern_entry.output_collection}")
 
 
     def rename_objects(self, context, pattern_entry, i):
         """Organize objects into collections based on pattern"""
+        selected_objects = list(bpy.context.selected_objects)
         collection = self.get_collection(context, pattern_entry)
                        
-        for obj in bpy.context.selected_objects:
+        for obj in selected_objects:
             # Added line for renaming
             obj.name = f"{pattern_entry.new_name}.{i+1:03d}"
 
@@ -68,7 +74,7 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
             originalCollection.objects.unlink(obj)
             collection.objects.link(obj)
         
-        print(f"Iteration {i+1}: Objects organized into collection: {pattern_entry.output_collection}")
+        print(f"Iteration {i+1}: {len(selected_objects)} objects organized into collection: {pattern_entry.output_collection}")
 
 
     def join_objects(self, context, pattern_entry, i):
@@ -105,9 +111,14 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
 
     def execute(self, context):
         pattern_props = context.scene.pattern_props
+        quicksort_props = context.scene.quicksort_props
         
         if not pattern_props:
             self.report({'INFO'}, "No pattern properties defined, cancelled.")
+            return {'CANCELLED'}
+        
+        if not quicksort_props.main_collection:
+            self.report({'ERROR'}, "Yoou must set a main collection!")
             return {'CANCELLED'}
 
         used_pattern_samples = set()

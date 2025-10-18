@@ -11,10 +11,9 @@ class SETUPAUTO_OT_patternsdetection(bpy.types.Operator):
     bl_description = "Operator loops through selected objects, finding string patterns in their names"
     bl_options = {'REGISTER', 'UNDO'}
 
-
-
     # pattern detection does the main work in itself.
     # apply_patterns_to_ui is the function that applies the patterns to the UI.
+
     def pattern_detection(self, object_names):
         """pattern detection algorithm"""
 
@@ -69,16 +68,15 @@ class SETUPAUTO_OT_patternsdetection(bpy.types.Operator):
 
         pattern_props.clear()
     
-        #pattern_index = 0
-        for i, entry in patterns:
+        pattern_index = 0
+        for entry in patterns:
             
             bpy.ops.setupauto.add_pattern()
-            current_pattern = pattern_props[i]
-            current_pattern.output_collection = entry
-            current_pattern.pattern_sample = entry
+            pattern_entry = pattern_props[pattern_index]
+            pattern_entry.output_collection = entry
+            pattern_entry.pattern_sample = entry
 
-            #pattern_index += 1
-
+            pattern_index += 1
 
 
     def execute(self, context):
@@ -109,5 +107,41 @@ class SETUPAUTO_OT_patternsdetection(bpy.types.Operator):
         except:
             self.report({'ERROR'}, "Failed to apply patterns to UI")
             return {'CANCELLED'}
-        
+
         return {'FINISHED'}
+
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+    
+
+    def draw(self, context):
+        layout = self.layout
+
+        rowAttention = layout.row()
+        rowAttention.alignment = 'CENTER'
+        rowAttention.label(text="!!!VERY IMPORTANT!!!", icon = 'INFO')
+
+        columnExplain = layout.column(align = True)
+        columnExplain.ui_units_x = 500
+        columnExplain.label(text = "After the automatic pattern detection finishes,", icon = 'DOT')
+        columnExplain.label(text = "pattern are arranged based on their lengths.")
+        columnExplain.label(text = "When assigning output and parent collections and actions,")
+        columnExplain.label(text = "it is the best practice to work down the list:")
+        columnExplain.label(text = "from first-shortest to last-longet.")
+
+        columnExplain.label(text = "")
+
+        columnExplain.label(text = "Reason is that some longer pattern may contain", icon = 'DOT')
+        columnExplain.label(text = "some of the shorter patterns inside them.")
+        columnExplain.label(text = "The shorter patterns will select a lot more objects")
+        columnExplain.label(text = "so it is better to let shorter patterns select first,")
+        columnExplain.label(text = "and then the longer patterns will select more specificly.")
+
+        columnExplain.label(text = "")
+
+        columnExplain.label(text = "Example:", icon = 'DOT')
+        columnExplain.label(text = "BLK-Wall, BLK-Wall-INT, BLK-Wall-INT")
+        columnExplain.label(text = "BLK-Wall will select ALL walls.")
+        columnExplain.label(text = "Only then BLK-Wall-INT, BLK-Wall-INT will select")
+        columnExplain.label(text = "the types of walls they refer to specificly.")

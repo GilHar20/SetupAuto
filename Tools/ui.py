@@ -48,16 +48,4 @@ class SETUPAUTO_PT_tools_panel(bpy.types.Panel):
 
         columnInst.operator('setupauto.ot_dups2inst', text = "Duplicate to Instances")
         columnInst.operator('setupauto.ot_singleuser', text = "Make Single Users")
-
-
-        # Purge Unused Data section
-        boxPurge = layout.box()
-        boxPurge.label(text="Purge Unused Data")
-        columnPurge = boxPurge.column(align=True)
-
-        rowFlags = columnPurge.row(align=True)
-        rowFlags.prop(toolprops, "do_local", text="Do Local", toggle=True)
-        rowFlags.prop(toolprops, "do_linked", text="Do Linked", toggle=True)
-        rowFlags.prop(toolprops, "do_recursive", text="Do Recursive", toggle=True)
-        
-        columnPurge.operator('setupauto.ot_purgeunused', text="Purge Unused Data")
+        columnInst.operator('outliner.orphans_purge', text = "Purge Unused Data")

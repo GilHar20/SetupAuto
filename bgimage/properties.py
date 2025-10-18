@@ -3,6 +3,12 @@ import bpy
 
 
 class SETUPAUTO_PG_bgimage_props (bpy.types.PropertyGroup):
+    auto_detect_resolution : bpy.props.BoolProperty(
+        name = "Auto-detect Resolution",
+        description = "Check to automatically detect resolution from loaded images instead of using manual settings.",
+        default = True
+    )
+    
     resolution_x : bpy.props.IntProperty(
         name = "Resolution X",
         description = "Set scene X resolution.",
@@ -59,10 +65,4 @@ class SETUPAUTO_PG_bgimage_props (bpy.types.PropertyGroup):
         ('HDR', "HDR", "HDR image"),
         ],
         default = "JPG"
-    )
-
-    auto_detect_resolution : bpy.props.BoolProperty(
-        name = "Auto-detect Resolution",
-        description = "Check to automatically detect resolution from loaded images instead of using manual settings.",
-        default = True
     )

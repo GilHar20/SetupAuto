@@ -9,6 +9,7 @@ classes = [
     properties.SETUPAUTO_OT_add_pattern,
     properties.SETUPAUTO_OT_remove_pattern,
     properties.SETUPAUTO_OT_clear_patterns,
+    properties.SETUPAUTO_OT_select_pattern,
     operator.SETUPAUTO_OT_quicksort,
     patternsdetection.SETUPAUTO_OT_patternsdetection,
     ui.SETUPAUTO_PT_quicksort_panel
