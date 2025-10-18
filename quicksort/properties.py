@@ -5,7 +5,7 @@ import bpy
 class SETUPAUTO_PG_quicksort_props (bpy.types.PropertyGroup):
     main_collection : bpy.props.PointerProperty(
         name = "Main Collection",
-        description = "Main collection to cotain all new created collections. Leave empty to link to scene collection.",
+        description = "Main collection to cotain all new created collections. Must not be left empty.",
         type = bpy.types.Collection
     )
 
@@ -18,15 +18,16 @@ class SETUPAUTO_PG_pattern_props (bpy.types.PropertyGroup):
 
     output_collection : bpy.props.StringProperty(
         name = "Output Collection",
-        description = "Collection to contain all objects selected by this pattern will be stored with this name. " \
-        "If empty, the collection will be named the same as the pattern sample.",
+        description = "The collection in which all objects selected by the current pattern sample will be stored. " \
+        "If left empty, the collection will be named the same as the pattern sample. " \
+        "If  Output Collection is filled, and a collection with the same name already exists, the existing collection will be used.",
         default = ""
     )
 
     parent_collection : bpy.props.PointerProperty(
         name = "Parent Collection",
         description = "Collection to contain the new Output Collection. Leave empty to link Output Collection to Main Collection. " \
-        "If Main Collection also empty, Output Collection will link to scene collection.",
+        "If Output collection already exists, Parent collection will be ignored.",
         type = bpy.types.Collection
     )
 
