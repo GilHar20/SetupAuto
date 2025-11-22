@@ -1,6 +1,5 @@
 import bpy
 import re
-from collections import defaultdict
 
 
 

@@ -46,6 +46,7 @@ class SETUPAUTO_PT_tools_panel(bpy.types.Panel):
         boxInst.label(text="Instances Tools")
         columnInst = boxInst.column(align=True)
 
-        columnInst.operator('setupauto.ot_dups2inst', text = "Duplicate to Instances")
+        columnInst.operator('setupauto.ot_smartselect', text = "Selecte All Linked")
         columnInst.operator('setupauto.ot_singleuser', text = "Make Single Users")
+        columnInst.operator('setupauto.ot_dups2inst', text = "Duplicate to Instances")
         columnInst.operator('outliner.orphans_purge', text = "Purge Unused Data")

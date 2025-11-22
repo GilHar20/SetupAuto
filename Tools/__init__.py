@@ -1,11 +1,12 @@
 import bpy
 
 # Tools module registration
-from . import properties, smartapply, proximityjoin, singleuser, duplicates2instances, ui
+from . import properties, smartapply, smartselect, proximityjoin, singleuser, duplicates2instances, ui
 
 classes = [
     properties.SETUPAUTO_PG_tools_props,
     smartapply.SETUPAUTO_OT_smartapply,
+    smartselect.SETUPAUTO_OT_smartselect,
     proximityjoin.SETUPAUTO_OT_proxjoin,
     singleuser.SETUPAUTO_OT_singleuser,
     duplicates2instances.SETUPAUTO_OT_dups2inst,

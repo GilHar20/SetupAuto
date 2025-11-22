@@ -112,19 +112,21 @@ class SETUPAUTO_OT_quicksort(bpy.types.Operator):
     def execute(self, context):
         pattern_props = context.scene.pattern_props
         quicksort_props = context.scene.quicksort_props
-        
+        used_pattern_samples = set()
+
         if not pattern_props:
-            self.report({'INFO'}, "No pattern properties defined, cancelled.")
+            self.report({'ERROR'}, "No pattern properties defined, cancelled.")
             return {'CANCELLED'}
         
         if not quicksort_props.main_collection:
             self.report({'ERROR'}, "Yoou must set a main collection!")
             return {'CANCELLED'}
 
-        used_pattern_samples = set()
+        # Sort pattern_props by pattern_sample alphabetically
+        sorted_pattern_props = sorted(pattern_props, key=lambda x: (x.pattern_sample or "").lower())
 
         # Run the pattern operation for each item in the collection
-        for i, pattern_entry in enumerate(pattern_props):
+        for i, pattern_entry in enumerate(sorted_pattern_props):
             if not pattern_entry.pattern_sample:
                 print(f"Iteration {i+1}: Skipped, missing pattern sample.")
                 continue

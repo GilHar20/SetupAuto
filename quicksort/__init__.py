@@ -12,6 +12,7 @@ classes = [
     properties.SETUPAUTO_OT_select_pattern,
     operator.SETUPAUTO_OT_quicksort,
     patternsdetection.SETUPAUTO_OT_patternsdetection,
+    ui.SETUPAUTO_UL_pattern_list,
     ui.SETUPAUTO_PT_quicksort_panel
 ]
 
@@ -22,6 +23,7 @@ def register():
 
     bpy.types.Scene.pattern_props = bpy.props.CollectionProperty(type=properties.SETUPAUTO_PG_pattern_props)
     bpy.types.Scene.quicksort_props = bpy.props.PointerProperty(type=properties.SETUPAUTO_PG_quicksort_props)
+    bpy.types.Scene.pattern_index = bpy.props.IntProperty(name="QuickSort Pattern Index", default=0)
 
 def unregister():
     # Unregister classes

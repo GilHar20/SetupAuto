@@ -2,6 +2,60 @@ import bpy
 
 
 
+#===================================
+    # --- UIList ---
+#===================================
+class SETUPAUTO_UL_pattern_list(bpy.types.UIList):
+    """UIList for displaying collection items"""
+    
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        if self.layout_type in {'DEFAULT', 'COMPACT'}:
+            if item.pattern_sample:
+                layout.label(text = str(index + 1) + ": " + item.pattern_sample, icon = 'CHECKBOX_HLT')
+            else:
+                layout.label(text = str(index + 1) + ": " + "- no pattern -", icon = 'CHECKBOX_DEHLT')
+        elif self.layout_type in {'GRID'}:
+            layout.alignment = 'CENTER'
+            layout.label(text = item.pattern_sample, icon = 'CHECKBOX_HLT')
+
+    def filter_items(self, context, data, propname):
+        items = getattr(data, propname)
+        
+        # Initialize default values
+
+        filter_neworder = []
+        filter_flags = (range(len(items)))
+
+        # Get filter flags if filtering is enabled
+        if self.filter_name:
+            # Use the built-in filter_items_by_name helper for filtering
+            filter_flags = bpy.types.UI_UL_list.filter_items_by_name(
+                pattern = self.filter_name,
+                bitflag = self.bitflag_filter_item,
+                items = items,
+                propname = 'pattern_sample',
+                reverse = self.use_filter_sort_reverse
+            )
+            if self.use_filter_sort_reverse:
+                filter_flags.reverse()
+
+        else:
+            # No filtering - show all items
+            filter_flags = [self.bitflag_filter_item] * len(items)
+        
+        # Apply sorting if enabled
+        if self.use_filter_sort_alpha:
+            # Use the built-in sort_items_by_name helper for sorting
+            filter_neworder = bpy.types.UI_UL_list.sort_items_by_name(items, propname='pattern_sample')
+    
+
+        return filter_flags, filter_neworder
+
+    
+
+#===================================
+    # --- Settings Panel ---
+#===================================
 class SETUPAUTO_PT_quicksort_panel(bpy.types.Panel):
     '''Class draws quicksort UI panel'''
     bl_idname = "setupauto.pt_quicksort_panel"
@@ -14,65 +68,57 @@ class SETUPAUTO_PT_quicksort_panel(bpy.types.Panel):
         layout = self.layout
         pattern_props = context.scene.pattern_props
         quicksort_props = context.scene.quicksort_props
+        pattern_index = context.scene.pattern_index
 
-
-        # quick sort settings:
         boxSort = layout.box()
         
-        columnCollection = boxSort.column(align=True)
-
-        #rowDetection = columnCollection.row()
-        columnCollection.operator('setupauto.ot_patternsdetection', text="Detect Patterns!")
-        
-        rowAddRemove = columnCollection.row(align=True)
-        rowAddRemove.operator("setupauto.add_pattern", text="Add Pattern", icon='ADD')
-        rowAddRemove.operator("setupauto.remove_pattern", text="Remove Pattern", icon='REMOVE')
-
-        columnCollection.operator("setupauto.clear_patterns", text="Clear All Paterns", icon='TRASH')
-
-        rowCollection = columnCollection.row()
-        rowCollection.prop(quicksort_props, "main_collection", text="Main Collection")
+        rowCollection = boxSort.row()
+        rowCollection.prop(quicksort_props, "main_collection", text = "", placeholder = "Main Collection")
         if quicksort_props.main_collection == None:
             rowInfo = boxSort.row()
             rowInfo.label(text = " You must assign a main collection!", icon = 'INFO')
 
-        if pattern_props:
-            rowSort = boxSort.row()
-            rowSort.alignment = 'CENTER'
-            columnSort = rowSort.column()
-            columnSort.scale_x = 1
-            columnSort.operator('setupauto.ot_quicksort', text = "Quick Sort!", icon='PLAY')
+
+        rowSort = boxSort.row(align = True)
+        rowSort.operator('setupauto.ot_patternsdetection', text="Detect Patterns!")
+        rowSort.operator('setupauto.ot_quicksort', text = "Quick Sort!", icon='PLAY')
 
         rowLabel = boxSort.row()
         rowLabel.label(text=f"Number of patterns: {len(pattern_props)}")
 
+        rowList = boxSort.row()        
+        rowList.template_list(
+            "SETUPAUTO_UL_pattern_list",    # list_type (you'll need to create this)
+            "setupauto_pattern_list",       # list_id (unique identifier)
+            context.scene,                  # dataptr (the data block containing the collection)
+            "pattern_props",                # propname (name of the CollectionProperty)
+            context.scene,                  # active_dataptr (data block containing active index)
+            "pattern_index",                # active_propname (name of the IntProperty for active index)
+            rows = 8                        # optional: number of rows to display
+        )
+        columnList = rowList.column(align = True)
+        columnList.operator("setupauto.add_pattern",    text = "", icon = 'ADD')
+        columnList.operator("setupauto.remove_pattern", text = "", icon = 'REMOVE')
+        columnList.operator("setupauto.clear_patterns", text = "", icon = 'TRASH')
 
-        # Draw pattern properties for each item in the collection - each in its own box    
-        for i, pattern_entry in enumerate(pattern_props):
+        # Draw pattern properties for the active item in the UIList
+        if pattern_props and 0 <= pattern_index < len(pattern_props):
+            pattern_entry = pattern_props[pattern_index]
             patternBox = boxSort.box()
-            rowTop = patternBox.row(align=True)
-            rowTop.label(text=f"Pattern Entry #{i+1}:", icon = 'SORTSIZE')
+            rowTop = patternBox.row(align = True)
+            rowTop.label(text=f"Pattern Entry #{pattern_index + 1}:", icon = 'SORTSIZE')
             rowTop.operator('setupauto.select_pattern', text = "", icon = 'VIEW_ZOOM').select_pattern = str(pattern_entry.pattern_sample)
-            rowTop.operator('setupauto.remove_pattern', text = "", icon = 'REMOVE').pattern_index = i
+            rowTop.operator('setupauto.remove_pattern', text = "", icon = 'REMOVE').pattern_index = pattern_index
 
-            rowAction = patternBox.row(align=True)
+            rowAction = patternBox.row(align = True)
             rowAction.prop(pattern_entry, "pattern_action", text="")
             rowAction.prop(pattern_entry, "pattern_sample", text="", placeholder="Sample")
 
-            rowCollection = patternBox.row(align=True)
+            rowCollection = patternBox.row(align = True)
             rowCollection.prop(pattern_entry, "parent_collection", text="", placeholder="Parent Collection")
             rowCollection.prop(pattern_entry, "output_collection", text="", placeholder="Output Collection", icon = 'OUTLINER_COLLECTION')
 
-            match pattern_entry.pattern_action:
-                case 'RENAME':
-                    rowRename = patternBox.row()
-                    rowRename.prop(pattern_entry, "new_name", text="", placeholder="New Name")
-                case 'ORGANIZE', 'JOIN', 'DELETE':
-                    pass
+            if pattern_entry.pattern_action == 'RENAME':
+                rowRename = patternBox.row()
+                rowRename.prop(pattern_entry, "new_name", text="", placeholder="New Name")
 
-        if pattern_props:
-            rowSort2 = boxSort.row()
-            rowSort2.alignment = 'CENTER'
-            columnSort2 = rowSort2.column()
-            columnSort2.scale_x = 1
-            columnSort2.operator('setupauto.ot_quicksort', text = "Quick Sort!", icon='PLAY')
