@@ -3,7 +3,10 @@ import bpy
 
 
 class SETUPAUTO_PG_tools_props (bpy.types.PropertyGroup):
-    # Proximity Join Properties
+    
+#===================================
+    # --- Proximity Join Properties ---
+#===================================
     proximity : bpy.props.FloatProperty(
         name = "Proximity",
         description = "Maximum distance to merge objects.",
@@ -11,8 +14,10 @@ class SETUPAUTO_PG_tools_props (bpy.types.PropertyGroup):
         min = 0.1,
         max = 1000
     )
-    
-    # Proximity Join Axis Selection
+
+#===================================
+    # --- Proximity Join Properties ---
+#===================================
     proximity_x : bpy.props.BoolProperty(
         name = "Proximity X",
         description = "Consider X axis for proximity calculation.",
@@ -31,30 +36,9 @@ class SETUPAUTO_PG_tools_props (bpy.types.PropertyGroup):
         default = True
     )
 
-
-
-    # Purge Unsused Data Properties
-    do_local : bpy.props.BoolProperty(
-        name = "Do Local Data",
-        description = "Check to perform purge on data stored in this file.",
-        default= True
-    )
-
-    do_linked : bpy.props.BoolProperty(
-        name = "Do Linked Data",
-        description = "Check to perform purge on data linked to this file.",
-        default= True
-    )
-
-    do_recursive : bpy.props.BoolProperty(
-        name = "Do Recursive Data",
-        description = "Check to perform recursive purge on data.",
-        default= True
-    )
-
-
-
-    # Smart Apply Properties
+#===================================
+    # --- Smart Apply Properties ---
+#===================================
     location : bpy.props.BoolProperty(
         name = "Apply Location",
         default= False

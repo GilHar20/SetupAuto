@@ -18,10 +18,9 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
             return {'CANCELLED'}
 
         selected = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        remaining = set(selected)  # Keep track of unclustered objects
+        remaining = set(selected)
         clusters = []
         
-        # Create axis mask based on user selection
         axis_mask = Vector((
             1.0 if tools_props.proximity_x else 0.0,
             1.0 if tools_props.proximity_y else 0.0, 
@@ -48,11 +47,11 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
 
                 cluster.extend(close_objs)
                 to_check.extend(close_objs)
-                remaining.difference_update(close_objs)
+                remaining -= close_objs
 
             clusters.append(cluster)
 
-        # === JOIN OBJECTS IN EACH CLUSTER ===
+        # Join objects in cluster
         for cluster in clusters:
             if len(cluster) < 2:
                 continue  # Nothing to join

@@ -1,6 +1,5 @@
 from typing import Self
 import bpy
-import bmesh
 from mathutils import Vector
 
 
@@ -9,16 +8,13 @@ def duplicate_object(obj):
     # Create a copy of the object
     duplicate = obj.copy()
     duplicate.data = obj.data.copy()
-    #duplicate.name = obj.name + "_LOD"
-    
-    # Link the duplicate to the scene
+
     bpy.context.collection.objects.link(duplicate)
-    
-    # Apply convex hull using bpy.ops
+
+    bpy.ops.object.select_all(action='DESELECT')
     bpy.context.view_layer.objects.active = duplicate
     duplicate.select_set(True)
     
-    # Enter edit mode and apply convex hull
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='SELECT')
     bpy.ops.mesh.convex_hull()
@@ -35,18 +31,13 @@ def make_material_users(obj):
         Self.report({'INFO'}, "Object has no materials")
         return
     
-    new_materials = []
-    for material in obj.data.materials:
-        new_material = material.copy()
-        new_material.name = material.name + "_LOD"
-        new_materials.append(new_material)
-    
-    '''
-    # Assign the new materials to the object
-    obj.data.materials.clear()
-    for material in new_materials:
-        obj.data.materials.append(material)
-    '''
+    # Create new materials and replace them directly in their slots
+    for i, material in enumerate(obj.data.materials):
+        if material:  # Check if slot is not empty
+            new_material = material.copy()
+            new_material.name = material.name + "_LOD"
+            # Replace the material directly in its slot
+            obj.material_slots[i].material = new_material
 
 
 def get_texture_average_rgb(texture):
@@ -125,17 +116,17 @@ def replace_textures_with_rgb(material):
         nodes.remove(tex_node)
 
 
-def execute(self, context):
+def execute():
     """Main function to create LOD object from selected object."""
 
     obj = bpy.context.active_object
     
     if not obj:
-        self.report({'INFO'}, "No active object selected")
+        print("No active object selected")
         return
     
     if obj.type != 'MESH':
-        self.report({'INFO'}, "Selected object is not a mesh")
+        print("Selected object is not a mesh")
         return
     
     duplicate = duplicate_object(obj)
@@ -154,15 +145,6 @@ def execute(self, context):
     
     print(f"Created LOD object: {duplicate.name}")
     return duplicate
-
-    
-    def execute(self, context):
-        try:
-            create_lod_object()
-            self.report({'INFO'}, "LOD object created successfully")
-
-        except Exception as e:
-            self.report({'ERROR'}, f"Failed to create LOD object: {str(e)}")
 
 
 execute()

@@ -10,14 +10,12 @@ classes = [
 ]
 
 def register():
-    # Register classes
     for cls in classes:
         bpy.utils.register_class(cls)
 
     bpy.types.Scene.bgimage_props = bpy.props.PointerProperty(type=properties.SETUPAUTO_PG_bgimage_props)
 
 def unregister():
-    # Unregister classes
     if hasattr(bpy.types.Scene, 'bgimage_props'):
         delattr(bpy.types.Scene, 'bgimage_props')
 

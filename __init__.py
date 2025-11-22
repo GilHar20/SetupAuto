@@ -1,6 +1,6 @@
 bl_info = {
     "name": "SetupAuto",
-    "version": (1, 5, 4),
+    "version": (1, 5, 5),
     "blender": (4, 5, 0),
     "author": "Gilad Harnik",
     "location": "View3D > Tool Shelf",
@@ -23,10 +23,10 @@ from . import Tools
 from . import addon_updater_ops
 
 
-#==============================================
 
-
-
+#===================================
+    # --- Addon Updater ---
+#===================================
 @addon_updater_ops.make_annotations
 class SetupAutoPreferences(bpy.types.AddonPreferences):
     bl_idname = __name__
@@ -97,10 +97,9 @@ class SetupAutoPreferences(bpy.types.AddonPreferences):
         addon_updater_ops.update_notice_box_ui(self, context)
 
 
-#==============================================
-
-
-
+#===================================
+    # --- Registration ---
+#===================================
 def register():
     # Register preferences class (not part of auto-load)
     addon_updater_ops.make_annotations(SetupAutoPreferences)  # Avoid blender 2.8 warnings
@@ -113,7 +112,6 @@ def register():
     Tools.register()
 
 
-
 def unregister():
     # Addon updater unregister (before classes are unregistered)
     addon_updater_ops.unregister()
@@ -124,9 +122,6 @@ def unregister():
     
     # Unregister preferences class (not part of auto-load)
     bpy.utils.unregister_class(SetupAutoPreferences)
-
-
-#==============================================
 
 
 

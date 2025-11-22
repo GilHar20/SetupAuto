@@ -11,29 +11,56 @@ class SETUPAUTO_OT_dups2inst(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
 
-    accuracy : bpy.props.IntProperty(name="Floating Point Accuracy", description="Accurate of the vertex positions when comparing meshes; Or: how many numbers after decimal point. " + \
-                                     "Higher number is more accurate, but slower.", default=6, min=1, max=7)
+    mode : bpy.props.EnumProperty(
+        name = "",
+        description = "",
+        items = [
+        ('BOX', "Bounding Box", "Use bounding box"),
+        ('FULL', "Full Topology", "Use Full Topology"),
+        ],
+        default = 'BOX'
+    )
 
-    rename : bpy.props.BoolProperty(name="Rename", description="Rename linked objects", default=False)
+    accuracy : bpy.props.IntProperty(
+        name = "Floating Point Accuracy", 
+        description = "Accurate of the vertex positions when comparing meshes; Or: how many numbers after decimal point. Higher number is more accurate, but slower.", 
+        default = 2, 
+        min = 1, 
+        max = 7
+    )
 
-    new_name : bpy.props.StringProperty(name="New Name", description="New name to give all new linked objects. NOTE! Will name ALL selected objects!", default="")
+    rename : bpy.props.BoolProperty(
+        name = "Rename",
+        description = "Rename linked objects",
+        default = False
+    )
+
+    new_name : bpy.props.StringProperty(name = "New Name", description = "New name to give all new linked objects. NOTE! Will name ALL selected objects!", default = "")
 
 
     def mesh_hash(self, context, obj):
         mesh = obj.data
-        verts = tuple(round(v.co.x, self.accuracy) for v in mesh.vertices) + \
-                tuple(round(v.co.y, self.accuracy) for v in mesh.vertices) + \
-                tuple(round(v.co.z, self.accuracy) for v in mesh.vertices)
-        materials = tuple(mat.name if mat else "None" for mat in mesh.materials)
-        return hashlib.md5(str((verts, materials)).encode()).hexdigest()
+        
+        if self.mode == 'BOX':
+            # Use bounding box dimensions for comparison
+            dimensions = tuple(round(d, self.accuracy) for d in obj.dimensions)
+            materials = tuple(mat.name if mat else "None" for mat in mesh.materials)
+            return hashlib.md5(str((dimensions, materials)).encode()).hexdigest()
+        elif self.mode == 'FULL':
+            # Full topology mode - use all vertex positions
+            verts = tuple(round(v.co.x, self.accuracy) for v in mesh.vertices) + \
+                    tuple(round(v.co.y, self.accuracy) for v in mesh.vertices) + \
+                    tuple(round(v.co.z, self.accuracy) for v in mesh.vertices)
+            materials = tuple(mat.name if mat else "None" for mat in mesh.materials)
+            return hashlib.md5(str((verts, materials)).encode()).hexdigest()
 
 
     def execute(self, context):
-        if len(bpy.context.selected_objects) <= 1:
+        selected = context.selected_objects
+
+        if len(selected) <= 1:
             self.report({'INFO'}, "You need to select two or more objects.")
             return {'CANCELLED'}
-
-        selected = context.selected_objects
 
         seen = {}
         for obj in selected:
@@ -54,14 +81,20 @@ class SETUPAUTO_OT_dups2inst(bpy.types.Operator):
             bpy.context.view_layer.objects.active = list[0]
             bpy.ops.object.make_links_data(type='OBDATA')
 
-        #new = bpy.data.objects.new(name=ref.name + "_inst", object_data=ref.data)
-        #new.matrix_world = obj.matrix_world
-        #bpy.context.collection.objects.link(new)
-        #bpy.data.objects.remove(context, obj)
-
         self.report({'INFO'},"Finished linking" + str(len(selected)) + " objects!")
         return {'FINISHED'}
     
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
+    
+
+    def draw(self, context):
+        layout = self.layout
+        layout.label(text = "'BOX': Less accurate, easier to link data.", icon = 'INFO')
+        layout.label(text = "'FULL': More accurate, harder to link data.", icon = 'INFO')
+
+        layout.prop(self, 'mode', text = "Mode")
+        layout.prop(self, 'accuracy', text = "Accuracy")
+        layout.prop(self, 'rename', text = "Rename")
+        layout.prop(self, 'new_name', text = "New Name")

@@ -16,7 +16,7 @@ class SETUPAUTO_OT_bgimage(bpy.types.Operator):
         bg_props = context.scene.bgimage_props
         
         base_name, _ = os.path.splitext(camera.name)
-        background_image_path = os.path.join(background_folder_path, base_name + bg_props.image_format)
+        background_image_path = os.path.join(background_folder_path, base_name + "." + bg_props.image_format)
 
         background_image = None
 
@@ -53,11 +53,20 @@ class SETUPAUTO_OT_bgimage(bpy.types.Operator):
 
     def execute(self, context):
         bg_props = context.scene.bgimage_props
-        
-        background_folder_path = bg_props.bgimage_folder_path
-        auto_detect_resolution = bg_props.auto_detect_resolution
-        cameras = [obj for obj in bpy.context.selected_objects if obj.type == 'CAMERA']
         scene = context.scene
+
+        background_folder_path = bg_props.folder_path
+        auto_detect_resolution = bg_props.autodetect_resolution
+        cameras = [obj for obj in bpy.context.selected_objects if obj.type == 'CAMERA']
+        failed = 0
+
+        if background_folder_path == "":
+            self.report({'WARNING'}, "You must specify a folder path!")
+            return {'CANCELLED'}
+        
+        if cameras == []:
+            self.report({'WARNING'}, "You must select atleast one camera!")
+            return {'CANCELLED'}            
         
         # Set initial resolution based on user preference
         if not auto_detect_resolution:
@@ -79,6 +88,7 @@ class SETUPAUTO_OT_bgimage(bpy.types.Operator):
 
             if background_image is None:
                 print(f"Could not load any image for {camera.name}")
+                failed += 1
                 continue
 
             # Get image dimensions from the first successfully loaded image (only if auto-detect is enabled)
@@ -112,4 +122,10 @@ class SETUPAUTO_OT_bgimage(bpy.types.Operator):
             bgimage.frame_method = bg_props.frame_method
             bgimage.alpha = bg_props.opacity
 
+        if failed == 0:
+            self.report({'INFO'}, "Success! All images matched to a camera")            
+        elif failed == len(cameras):
+            self.report({'INFO'}, "Failure! No imaged matched a camera")
+        else:
+            self.report({'INFO'}, str(failed) + " of images could not be matched to a camera")
         return {'FINISHED'}

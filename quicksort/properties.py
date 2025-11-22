@@ -2,6 +2,9 @@ import bpy
 
 
 
+#===================================
+    # --- Property Group -> Pointer Property ---
+#===================================
 class SETUPAUTO_PG_quicksort_props (bpy.types.PropertyGroup):
     main_collection : bpy.props.PointerProperty(
         name = "Main Collection",
@@ -9,6 +12,10 @@ class SETUPAUTO_PG_quicksort_props (bpy.types.PropertyGroup):
         type = bpy.types.Collection
     )
 
+
+#===================================
+    # --- Property Group -> Collection Property ---
+#===================================
 class SETUPAUTO_PG_pattern_props (bpy.types.PropertyGroup):
     pattern_sample : bpy.props.StringProperty(
         name = "Pattern Sample",
@@ -50,17 +57,19 @@ class SETUPAUTO_PG_pattern_props (bpy.types.PropertyGroup):
     )
 
 
-
+#===================================
+    # --- Operators -> Collection Property---
+#===================================
 class SETUPAUTO_OT_add_pattern(bpy.types.Operator):
     '''Add a new pattern to the collection'''
     bl_idname = "setupauto.add_pattern"
     bl_label = "Add Pattern"
     bl_description = "Add a new pattern to the collection"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         context.scene.pattern_props.add()
         return {'FINISHED'}
-
 
 
 class SETUPAUTO_OT_remove_pattern(bpy.types.Operator):
@@ -68,6 +77,7 @@ class SETUPAUTO_OT_remove_pattern(bpy.types.Operator):
     bl_idname = "setupauto.remove_pattern"
     bl_label = "Remove Pattern"
     bl_description = "Remove the last pattern from the collection"
+    bl_options = {'REGISTER', 'UNDO'}
 
     pattern_index : bpy.props.IntProperty(
         name = "Pattern Index",
@@ -91,12 +101,12 @@ class SETUPAUTO_OT_remove_pattern(bpy.types.Operator):
         return {'FINISHED'}
 
 
-
 class SETUPAUTO_OT_clear_patterns(bpy.types.Operator):
     '''Clears all patterns from the collection'''
     bl_idname = "setupauto.clear_patterns"
     bl_label = "Clear Patterns"
     bl_description = "Clears all patterns from the collection"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         if len(context.scene.pattern_props) > 0:
@@ -104,12 +114,12 @@ class SETUPAUTO_OT_clear_patterns(bpy.types.Operator):
         return {'FINISHED'}
 
 
-
 class SETUPAUTO_OT_select_pattern(bpy.types.Operator):
     '''Select all objects corresponding to the patern'''
     bl_idname = "setupauto.select_pattern"
     bl_label = "Select Patterns"
     bl_description = "Select all objects corresponding to the patern"
+    bl_options = {'REGISTER', 'UNDO'}
 
     select_pattern : bpy.props.StringProperty(
         name = "Select Pattern",
@@ -120,7 +130,10 @@ class SETUPAUTO_OT_select_pattern(bpy.types.Operator):
     def execute(self, context):
         bpy.ops.object.select_pattern(pattern = "*" + self.select_pattern + "*", case_sensitive = False, extend = False)
         
-        bpy.context.view_layer.objects.active = context.selected_objects[0]
-
-        self.report({'INFO'}, "Selected " + str(len(context.selected_objects)) + " objects!")
-        return {'FINISHED'}
+        if context.selected_objects:
+            bpy.context.view_layer.objects.active = context.selected_objects[0]
+            self.report({'INFO'}, "Selected " + str(len(context.selected_objects)) + " objects!")
+            return {'FINISHED'}
+        else:
+            self.report({'INFO'}, "There are no objects with this pattern to select!")
+            return {'FINISHED'} 

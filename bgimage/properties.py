@@ -3,7 +3,7 @@ import bpy
 
 
 class SETUPAUTO_PG_bgimage_props (bpy.types.PropertyGroup):
-    auto_detect_resolution : bpy.props.BoolProperty(
+    autodetect_resolution : bpy.props.BoolProperty(
         name = "Auto-detect Resolution",
         description = "Check to automatically detect resolution from loaded images instead of using manual settings.",
         default = True
@@ -21,7 +21,7 @@ class SETUPAUTO_PG_bgimage_props (bpy.types.PropertyGroup):
         default = 1080
     )
 
-    bgimage_folder_path : bpy.props.StringProperty(
+    folder_path : bpy.props.StringProperty(
         name = "Images folder path",
         description = "Foldes path for the folder that contains all images.",
         default = "",
@@ -42,7 +42,7 @@ class SETUPAUTO_PG_bgimage_props (bpy.types.PropertyGroup):
         ('FIT', "Fit", "Fit image"),
         ('CROP', "Crop", "Crop image"),
         ],
-        default = 'STRETCH'
+        default = 'FIT'
     )
 
     display_depth : bpy.props.EnumProperty(
