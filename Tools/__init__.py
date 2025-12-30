@@ -1,9 +1,10 @@
 import bpy
 
 # Tools module registration
-from . import properties, smartapply, smartselect, proximityjoin, singleuser, duplicates2instances, ui
+from . import properties, clearcustomnormals, smartapply, smartselect, proximityjoin, singleuser, duplicates2instances, ui
 
 classes = [
+    clearcustomnormals.SETUPAUTO_OT_removecustomnormals,
     properties.SETUPAUTO_PG_tools_props,
     smartapply.SETUPAUTO_OT_smartapply,
     smartselect.SETUPAUTO_OT_smartselect,
