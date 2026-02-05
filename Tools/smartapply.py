@@ -9,10 +9,25 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
     bl_description = "Operator loops through selected objects, apllies selected transform data, including batches of linked data"
     bl_options = {'REGISTER', 'UNDO'}
 
-    def execute(self, context):
-        tools_props = context.scene.tools_props
 
-        for area in bpy.context.screen.areas:
+    location : bpy.props.BoolProperty(
+        name = "Apply Location",
+        default= False
+    )
+
+    rotation : bpy.props.BoolProperty(
+        name = "Apply Rotation",
+        default= False
+    )
+
+    scale : bpy.props.BoolProperty(
+        name = "Apply Scale",
+        default= True
+    )
+
+
+    def execute(self, context):
+        for area in context.screen.areas:
             if area.type == 'VIEW_3D':
                 view_3d = area.spaces.active
 
@@ -34,10 +49,10 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
             obj = remaining.pop()
             
             if obj.data and obj.data.users > 1:
-                bpy.context.view_layer.objects.active = obj
+                context.view_layer.objects.active = obj
                 bpy.ops.object.select_linked(extend = False, type = 'OBDATA')
 
-                bpy.ops.object.transform_apply(location = tools_props.location, rotation = tools_props.rotation, scale = tools_props.scale)
+                bpy.ops.object.transform_apply(location = self.location, rotation = self.rotation, scale = self.scale)
                 
                 remaining -= set(context.selected_objects)
 
@@ -45,12 +60,26 @@ class SETUPAUTO_OT_smartapply(bpy.types.Operator):
 
             elif obj.data:
                 obj.select_set(True)
-                bpy.context.view_layer.objects.active = obj
-                bpy.ops.object.transform_apply(location = tools_props.location, rotation = tools_props.rotation, scale = tools_props.scale)
-                remaining.remove(obj)
-                bpy.ops.object.select_all(action='DESELECT')
+                context.view_layer.objects.active = obj
+                bpy.ops.object.transform_apply(location = self.location, rotation = self.rotation, scale = self.scale)
+                #bpy.ops.object.select_all(action='DESELECT')
 
         for obj in selected:
             obj.select_set(True)
 
         return {'FINISHED'}
+    
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+    
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.label(text = "This operator is VERY heavy.", icon = 'INFO')
+        layout.label(text = "!USE CAREFULLY IN SMALL BATCHES!")
+
+        rowAxis = layout.row(align = True)
+        rowAxis.prop(self, 'location', text = "Location", toggle = True)
+        rowAxis.prop(self, 'rotation', text = "Rotation", toggle = True)
+        rowAxis.prop(self, 'scale', text = "Scale", toggle = True)

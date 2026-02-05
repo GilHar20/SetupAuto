@@ -10,9 +10,7 @@ class SETUPAUTO_OT_smartselect(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        tools_props = context.scene.tools_props
-
-        for area in bpy.context.screen.areas:
+        for area in context.screen.areas:
             if area.type == 'VIEW_3D':
                 view_3d = area.spaces.active
 
@@ -36,7 +34,7 @@ class SETUPAUTO_OT_smartselect(bpy.types.Operator):
         '''    
         for obj in selected:
             if obj.data.users > 1 and obj not in context.selected_objects:
-                bpy.context.view_layer.objects.active = obj
+                context.view_layer.objects.active = obj
                 bpy.ops.object.select_linked(extend = True, type = 'OBDATA')
 
             elif obj not in context.selected_objects:

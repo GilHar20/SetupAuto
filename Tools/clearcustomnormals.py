@@ -15,9 +15,12 @@ class SETUPAUTO_OT_removecustomnormals(bpy.types.Operator):
             self.report({'INFO'}, "Please select objects to clear normals from")
             return {'FINISHED'}
 
-        selected = context.selected_objects
+        selected = set(context.selected_objects)
 
-        for obj in selected:
+        while selected:
+            obj = selected.pop()
+            same_data = {o for o in selected if o.data == obj.data}
+            selected -= same_data
             context.view_layer.objects.active = obj
             bpy.ops.object.mode_set(mode='EDIT')
             bpy.ops.mesh.customdata_custom_splitnormals_clear()

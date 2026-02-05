@@ -10,8 +10,33 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
     bl_description = "Operator loops through objects in the scene, joining objects together if are closer than specified proximity."
     bl_options = {'REGISTER', 'UNDO'}
 
+
+    proximity : bpy.props.FloatProperty(
+        name = "Proximity",
+        description = "Maximum distance to merge objects.",
+        default = 1.5,
+        min = 0.1,
+        max = 1000
+    )
+    proximity_x : bpy.props.BoolProperty(
+        name = "Proximity X",
+        description = "Consider X axis for proximity calculation.",
+        default = True
+    )
+    
+    proximity_y : bpy.props.BoolProperty(
+        name = "Proximity Y", 
+        description = "Consider Y axis for proximity calculation.",
+        default = True
+    )
+
+    proximity_z : bpy.props.BoolProperty(
+        name = "Proximity Z",
+        description = "Consider Z axis for proximity calculation.", 
+        default = True
+    )
+
     def execute(self, context):
-        tools_props = context.scene.tools_props
         
         if not context.selected_objects:
             self.report({'INFO'}, "No objects were selected. Please select objects.")
@@ -22,9 +47,9 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
         clusters = []
         
         axis_mask = Vector((
-            1.0 if tools_props.proximity_x else 0.0,
-            1.0 if tools_props.proximity_y else 0.0, 
-            1.0 if tools_props.proximity_z else 0.0
+            1.0 if self.proximity_x else 0.0,
+            1.0 if self.proximity_y else 0.0, 
+            1.0 if self.proximity_z else 0.0
         ))
 
         while remaining:
@@ -42,7 +67,7 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
                     # Apply axis mask to other object's location
                     other_loc_masked = Vector(other.location) * axis_mask
                     # Calculate distance only on selected axes
-                    if (current_loc_masked - other_loc_masked).length <= tools_props.proximity:
+                    if (current_loc_masked - other_loc_masked).length <= self.proximity:
                         close_objs.add(other)
 
                 cluster.extend(close_objs)
@@ -61,9 +86,26 @@ class SETUPAUTO_OT_proxjoin(bpy.types.Operator):
             for obj in cluster:
                 obj.select_set(True)
 
-            bpy.context.view_layer.objects.active = cluster[0]
+            context.view_layer.objects.active = cluster[0]
             bpy.ops.object.join()
 
         self.report({'INFO'}, f"Joined {len([c for c in clusters if len(c) > 1])} clusters.")
 
         return {'FINISHED'}
+    
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+    
+
+    def draw(self, context):
+        layout = self.layout
+
+        columnProximity = layout.column(align = True)
+
+        rowAxis = columnProximity.row(align = True)
+        rowAxis.prop(self, 'proximity_x', text = "X", toggle = True)
+        rowAxis.prop(self, 'proximity_y', text = "Y", toggle = True)
+        rowAxis.prop(self, 'proximity_z', text = "Z", toggle = True)
+
+        rowProximity = columnProximity.row()
+        rowProximity.prop(self, 'proximity', text = "Proximity")
