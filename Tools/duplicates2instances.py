@@ -78,7 +78,7 @@ class SETUPAUTO_OT_dups2inst(bpy.types.Operator):
             list = seen[key]
             for obj in list:
                 obj.select_set(True)
-            bpy.context.view_layer.objects.active = list[0]
+            context.view_layer.objects.active = list[0]
             bpy.ops.object.make_links_data(type='OBDATA')
 
         self.report({'INFO'},"Finished linking" + str(len(selected)) + " objects!")

@@ -1,9 +1,16 @@
 {
-    "last_check": "2025-10-15 17:31:17.480615",
+    "last_check": "2025-12-30 14:44:23.091088",
     "backup_date": "",
-    "update_ready": false,
+    "update_ready": true,
     "ignore": false,
     "just_restored": false,
     "just_updated": false,
-    "version_text": {}
+    "version_text": {
+        "link": "https://api.github.com/repos/GilHar20/SetupAuto/zipball/refs/tags/v1.6.1",
+        "version": [
+            1,
+            6,
+            1
+        ]
+    }
 }
